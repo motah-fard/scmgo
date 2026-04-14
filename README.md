@@ -8,7 +8,7 @@
 
 The first package, `inventory`, provides a small set of clear, reusable formulas for common inventory policy calculations. The goal is to keep the API simple, transparent, and easy to embed in Go applications.
 
-## v0.1.0 Scope
+## v0.1.2 Scope
 
 Initial release includes:
 
@@ -19,7 +19,7 @@ Initial release includes:
 
 ## Features
 
-Version `v0.1.0` includes support for:
+Version `v0.1.2` includes support for:
 
 - Reorder point
 - Basic safety stock
