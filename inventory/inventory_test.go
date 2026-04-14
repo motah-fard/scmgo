@@ -63,6 +63,33 @@ func TestReorderPoint(t *testing.T) {
 			},
 			wantErr: ErrNegativeSafetyStock,
 		},
+		{
+			name: "zero demand with nonzero safety stock",
+			input: ReorderPointInput{
+				AvgDailyDemand:   0,
+				LeadTimeDays:     5,
+				SafetyStockUnits: 25,
+			},
+			want: 25,
+		},
+		{
+			name: "zero lead time with nonzero demand and safety stock",
+			input: ReorderPointInput{
+				AvgDailyDemand:   100,
+				LeadTimeDays:     0,
+				SafetyStockUnits: 40,
+			},
+			want: 40,
+		},
+		{
+			name: "very large values",
+			input: ReorderPointInput{
+				AvgDailyDemand:   1_000_000,
+				LeadTimeDays:     365,
+				SafetyStockUnits: 10_000_000,
+			},
+			want: 375_000_000,
+		},
 	}
 
 	for _, tt := range tests {
@@ -262,6 +289,16 @@ func TestEOQ(t *testing.T) {
 			},
 			wantErr: ErrInvalidHoldingCost,
 		},
+		{
+			name: "very large values",
+			input: EOQInput{
+				AnnualDemand:       1_000_000_000,
+				OrderingCost:       10_000,
+				HoldingCostPerUnit: 25,
+			},
+			want:      894427.1909999159,
+			tolerance: 1e-6,
+		},
 	}
 
 	for _, tt := range tests {
@@ -330,6 +367,28 @@ func TestMinMaxLevels(t *testing.T) {
 				OrderQuantity: -1,
 			},
 			wantErr: ErrNegativeOrderQuantity,
+		},
+		{
+			name: "zero reorder point with positive order quantity",
+			input: MinMaxInput{
+				ReorderPoint:  0,
+				OrderQuantity: 500,
+			},
+			want: MinMaxResult{
+				Min: 0,
+				Max: 500,
+			},
+		},
+		{
+			name: "very large values",
+			input: MinMaxInput{
+				ReorderPoint:  10_000_000,
+				OrderQuantity: 5_000_000,
+			},
+			want: MinMaxResult{
+				Min: 10_000_000,
+				Max: 15_000_000,
+			},
 		},
 	}
 
