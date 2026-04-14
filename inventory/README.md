@@ -1,66 +1,32 @@
-# v0.1.0 Scope
-
-Initial release includes:
-
-- ReorderPoint
-- SafetyStockBasic
-- EOQ
-- MinMaxLevels
-
 # scmgo
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/motah-fard/scmgo.svg)](https://pkg.go.dev/github.com/motah-fard/scmgo)
+[![License](https://img.shields.io/github/license/motah-fard/scmgo)](https://github.com/motah-fard/scmgo/blob/main/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/motah-fard/scmgo)](https://github.com/motah-fard/scmgo/releases)
 
 `scmgo` is a Go library for practical inventory and supply-chain threshold calculations.
 
-The first package, `inventory`, provides a small set of clear and reusable formulas for common inventory policy calculations.
+The first package, `inventory`, provides a small set of clear, reusable formulas for common inventory policy calculations. The goal is to keep the API simple, transparent, and easy to embed in Go applications.
+
+## v0.1.0 Scope
+
+Initial release includes:
+
+- `ReorderPoint`
+- `SafetyStockBasic`
+- `EOQ`
+- `MinMaxLevels`
 
 ## Features
 
-Version `v0.1.0` includes:
+Version `v0.1.0` includes support for:
 
 - Reorder point
 - Basic safety stock
-- reorder point = average daily demand × lead time + safety stock
-- If the result is negative, the library returns 0 for this basic model.
-- safety stock = (max daily demand × max lead time) -
-               (average daily demand × average lead time)
-  
 - Economic order quantity (EOQ)
 - Min/max inventory levels
-- EOQ = sqrt((2 × annual demand × ordering cost) / holding cost per unit)
-Design Goals
-This library aims to be:
-simple
-transparent
-easy to use
-easy to embed in Go applications
-practical for backend systems, tools, and learning
-Assumptions
-Input units must be consistent.
-Example: if demand is measured per day, lead time should also be in days.
-Inputs must be non-negative unless otherwise stated.
-HoldingCostPerUnit must be greater than zero for EOQ.
-This version uses basic deterministic formulas and does not yet include:
-forecasting
-simulation
-service-level-based safety stock
-stochastic inventory models
-Roadmap
-Possible future additions:
-service-level-based safety stock
-z-score helpers
-demand forecasting helpers
-inventory simulation tools
-REST API / app layer built on top of the library
-License
-MIT
 
-## Important
-Replace:
-
-```text
-github.com/motah-fard/scmgo
 ## Installation
 
 ```bash
 go get github.com/motah-fard/scmgo
-
