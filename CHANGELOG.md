@@ -21,3 +21,13 @@ All notable changes to this project will be documented in this file.
 - Added `MinMaxLevels`
 - Added unit tests and examples
 - Added README and MIT license
+
+## [v0.2.0] - 2026-04-16
+### Added
+- ZScoreForServiceLevel for converting target service levels to z-scores
+- SafetyStockWithServiceLevel for probabilistic safety stock calculations
+- ReorderPointWithServiceLevel for reorder point calculations using service level targets
+
+### Improved
+- validation coverage for service-level-based inventory functions
+- clearer error handling for invalid service level and negative standard deviation inputs
