@@ -105,3 +105,31 @@ func ExampleReorderPointWithServiceLevel() {
 	fmt.Printf("%.2f\n", rp)
 	// Output: 232.90
 }
+
+func ExampleDemandDuringLeadTime() {
+	d, err := DemandDuringLeadTime(DemandDuringLeadTimeInput{
+		AvgDailyDemand: 100,
+		LeadTimeDays:   5,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.0f\n", d)
+	// Output: 500
+}
+
+func ExampleStdDevDemandDuringLeadTime() {
+	sd, err := StdDevDemandDuringLeadTime(StdDevDemandDuringLeadTimeInput{
+		StdDevDailyDemand: 10,
+		LeadTimeDays:      4,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.0f\n", sd)
+	// Output: 20
+}

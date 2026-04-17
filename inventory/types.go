@@ -33,14 +33,36 @@ type MinMaxResult struct {
 	Min float64
 	Max float64
 }
+
+// ReorderPointWithServiceLevelInput contains the inputs for calculating
+// reorder point using average daily demand, lead time, demand variability,
+// and a target cycle service level.
 type ReorderPointWithServiceLevelInput struct {
 	AvgDailyDemand    float64
 	LeadTimeDays      float64
 	StdDevDailyDemand float64
 	ServiceLevel      float64
 }
+
+// SafetyStockWithServiceLevelInput contains the inputs for calculating
+// safety stock using demand variability, lead time, and a target cycle
+// service level.
 type SafetyStockWithServiceLevelInput struct {
 	StdDevDailyDemand float64
 	LeadTimeDays      float64
 	ServiceLevel      float64
+}
+
+// DemandDuringLeadTimeInput contains the inputs for calculating
+// expected demand during lead time.
+type DemandDuringLeadTimeInput struct {
+	AvgDailyDemand float64
+	LeadTimeDays   float64
+}
+
+// StdDevDemandDuringLeadTimeInput contains the inputs for calculating
+// the standard deviation of demand during lead time.
+type StdDevDemandDuringLeadTimeInput struct {
+	StdDevDailyDemand float64
+	LeadTimeDays      float64
 }

@@ -23,7 +23,6 @@ func SafetyStockBasic(in SafetyStockInput) (float64, error) {
 	result := (in.MaxDailyDemand * in.MaxLeadTimeDays) -
 		(in.AvgDailyDemand * in.AvgLeadTimeDays)
 
-	// Safety stock should not be negative in practice for this basic model.
 	if result < 0 {
 		return 0, nil
 	}

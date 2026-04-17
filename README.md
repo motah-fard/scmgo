@@ -18,7 +18,7 @@ The goal is to keep the API:
 
 ## Current Scope
 
-As of `v0.2.0`, the `inventory` package includes:
+As of `v0.3.0`, the `inventory` package includes:
 
 - `ReorderPoint`
 - `SafetyStockBasic`
@@ -27,16 +27,20 @@ As of `v0.2.0`, the `inventory` package includes:
 - `ZScoreForServiceLevel`
 - `SafetyStockWithServiceLevel`
 - `ReorderPointWithServiceLevel`
+- `DemandDuringLeadTime`
+- `StdDevDemandDuringLeadTime`
 
 ## Why scmgo
 
-Many supply-chain and inventory calculations still live in spreadsheets, internal notes, or one-off scripts. `scmgo` aims to provide a lightweight Go-native alternative for developers building:
+Many inventory and supply-chain calculations still live in spreadsheets, internal notes, or one-off scripts. `scmgo` provides a lightweight Go-native alternative for developers building:
 
 - inventory tools
 - supply-chain applications
-- operations dashboards
-- internal planning services
-- educational or analytical tools
+- planning dashboards
+- internal operations services
+- educational and analytical tools
+
+The package is intentionally small, explicit, and easy to embed.
 
 ## Installation
 
