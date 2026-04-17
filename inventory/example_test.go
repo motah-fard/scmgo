@@ -63,3 +63,45 @@ func ExampleMinMaxLevels() {
 	fmt.Printf("min=%.0f max=%.0f\n", levels.Min, levels.Max)
 	// Output: min=300 max=500
 }
+
+func ExampleZScoreForServiceLevel() {
+	z, err := ZScoreForServiceLevel(0.95)
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.4f\n", z)
+	// Output: 1.6449
+}
+
+func ExampleSafetyStockWithServiceLevel() {
+	ss, err := SafetyStockWithServiceLevel(SafetyStockWithServiceLevelInput{
+		StdDevDailyDemand: 10,
+		LeadTimeDays:      4,
+		ServiceLevel:      0.95,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.2f\n", ss)
+	// Output: 32.90
+}
+
+func ExampleReorderPointWithServiceLevel() {
+	rp, err := ReorderPointWithServiceLevel(ReorderPointWithServiceLevelInput{
+		AvgDailyDemand:    50,
+		LeadTimeDays:      4,
+		StdDevDailyDemand: 10,
+		ServiceLevel:      0.95,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.2f\n", rp)
+	// Output: 232.90
+}

@@ -1,32 +1,29 @@
 package inventory
 
-// SafetyStockBasic calculates safety stock using the basic formula:
+import "math"
+
+// SafetyStockWithServiceLevel calculates safety stock using
+// demand variability, lead time, and a target cycle service level.
 //
-//	safety stock = (max daily demand × max lead time days) -
-//	               (average daily demand × average lead time days)
+// Formula:
 //
-// All input values must be non-negative.
-func SafetyStockBasic(in SafetyStockInput) (float64, error) {
-	if in.MaxDailyDemand < 0 {
-		return 0, ErrNegativeDemand
+//	safety stock = z × standard deviation of daily demand × sqrt(lead time days)
+//
+// All input values must be non-negative, and service level must be
+// strictly between 0 and 1.
+func SafetyStockWithServiceLevel(in SafetyStockWithServiceLevelInput) (float64, error) {
+	if in.StdDevDailyDemand < 0 {
+		return 0, ErrNegativeStandardDeviation
 	}
-	if in.MaxLeadTimeDays < 0 {
+	if in.LeadTimeDays < 0 {
 		return 0, ErrNegativeLeadTime
 	}
-	if in.AvgDailyDemand < 0 {
-		return 0, ErrNegativeDemand
-	}
-	if in.AvgLeadTimeDays < 0 {
-		return 0, ErrNegativeLeadTime
-	}
 
-	result := (in.MaxDailyDemand * in.MaxLeadTimeDays) -
-		(in.AvgDailyDemand * in.AvgLeadTimeDays)
-
-	// Safety stock should not be negative in practice for this basic model.
-	if result < 0 {
-		return 0, nil
+	z, err := ZScoreForServiceLevel(in.ServiceLevel)
+	if err != nil {
+		return 0, err
 	}
 
+	result := z * in.StdDevDailyDemand * math.Sqrt(in.LeadTimeDays)
 	return result, nil
 }

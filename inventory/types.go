@@ -33,3 +33,14 @@ type MinMaxResult struct {
 	Min float64
 	Max float64
 }
+type ReorderPointWithServiceLevelInput struct {
+	AvgDailyDemand    float64
+	LeadTimeDays      float64
+	StdDevDailyDemand float64
+	ServiceLevel      float64
+}
+type SafetyStockWithServiceLevelInput struct {
+	StdDevDailyDemand float64
+	LeadTimeDays      float64
+	ServiceLevel      float64
+}
