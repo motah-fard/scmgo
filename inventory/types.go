@@ -66,3 +66,31 @@ type StdDevDemandDuringLeadTimeInput struct {
 	StdDevDailyDemand float64
 	LeadTimeDays      float64
 }
+
+// TargetInventoryLevelInput contains the inputs for calculating
+// target inventory level from expected demand during lead time and safety stock.
+type TargetInventoryLevelInput struct {
+	ExpectedDemandDuringLeadTime float64
+	SafetyStockUnits             float64
+}
+
+// TargetInventoryLevelWithServiceLevelInput contains the inputs for calculating
+// target inventory level using demand, lead time, demand variability,
+// and a target cycle service level.
+type TargetInventoryLevelWithServiceLevelInput struct {
+	AvgDailyDemand    float64
+	LeadTimeDays      float64
+	StdDevDailyDemand float64
+	ServiceLevel      float64
+}
+
+// MinMaxLevelsWithServiceLevelInput contains the inputs for calculating
+// min/max inventory levels using a service-level-based reorder point
+// and a fixed order quantity.
+type MinMaxLevelsWithServiceLevelInput struct {
+	AvgDailyDemand    float64
+	LeadTimeDays      float64
+	StdDevDailyDemand float64
+	ServiceLevel      float64
+	OrderQuantity     float64
+}

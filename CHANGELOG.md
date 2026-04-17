@@ -31,3 +31,13 @@ All notable changes to this project will be documented in this file.
 ### Improved
 - validation coverage for service-level-based inventory functions
 - clearer error handling for invalid service level and negative standard deviation inputs
+
+## [v0.4.0] - 2026-04-16
+### Added
+- `TargetInventoryLevel` for calculating target inventory level from expected demand and safety stock
+- `TargetInventoryLevelWithServiceLevel` for calculating target inventory level using service-level-based safety stock
+- `MinMaxLevelsWithServiceLevel` for calculating min/max inventory levels using a service-level-based reorder point
+
+### Improved
+- Reused existing helpers to compose higher-level inventory policy functions
+- Expanded examples and documentation for target inventory and policy calculations

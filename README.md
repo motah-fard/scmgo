@@ -18,7 +18,7 @@ The goal is to keep the API:
 
 ## Current Scope
 
-As of `v0.3.0`, the `inventory` package includes:
+As of `v0.4.0`, the `inventory` package includes:
 
 - `ReorderPoint`
 - `SafetyStockBasic`
@@ -29,6 +29,9 @@ As of `v0.3.0`, the `inventory` package includes:
 - `ReorderPointWithServiceLevel`
 - `DemandDuringLeadTime`
 - `StdDevDemandDuringLeadTime`
+- `TargetInventoryLevel`
+- `TargetInventoryLevelWithServiceLevel`
+- `MinMaxLevelsWithServiceLevel`
 
 ## Why scmgo
 

@@ -13,4 +13,5 @@ var (
 	ErrNegativeReorderPoint      = errors.New("reorder point cannot be negative")
 	ErrInvalidServiceLevel       = errors.New("service level must be between 0 and 1 exclusive")
 	ErrNegativeStandardDeviation = errors.New("standard deviation cannot be negative")
+	ErrNegativeExpectedDemand    = errors.New("expected demand cannot be negative")
 )

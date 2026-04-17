@@ -1,7 +1,7 @@
 // Package inventory provides practical inventory policy calculations for
 // basic supply chain and stock management use cases.
 //
-// Version v0.3.0 includes:
+// Version v0.4.0 includes:
 //
 //   - Reorder point
 //   - Basic safety stock
@@ -12,6 +12,9 @@
 //   - Reorder point based on service level
 //   - Demand during lead time
 //   - Standard deviation of demand during lead time
+//   - Target inventory level
+//   - Target inventory level based on service level
+//   - Min/max levels based on service level
 //
 // The formulas in this package are intentionally simple and transparent.
 // They are designed for practical use in applications, internal tools,
@@ -30,6 +33,7 @@
 //     service-level-based safety stock.
 //   - StdDevDemandDuringLeadTime assumes independent demand variability
 //     across lead-time periods.
+//   - TargetInventoryLevel combines expected lead-time demand with safety stock.
 //   - This package does not include forecasting, stochastic optimization,
 //     multi-echelon inventory models, or fill-rate-based service models.
 package inventory
