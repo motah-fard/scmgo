@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.0.0] - 2026-04-18
+### Added
+- first stable release of the `inventory` package
+
+### Improved
+- finalized public API for practical inventory policy calculations
+- updated README for stable-release positioning and installation guidance
+- clarified package scope, assumptions, and stability language
+- completed documentation pass ahead of stable release
+- kept examples and package documentation aligned with the `v1.0.0` API
+
 ## [v0.6.0] - 2026-04-18
 ### Improved
 - reviewed naming consistency across the `inventory` package

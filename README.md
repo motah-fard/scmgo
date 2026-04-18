@@ -7,7 +7,7 @@
 
 `scmgo` is a Go library for practical inventory and supply-chain calculations.
 
-The first package, `inventory`, provides clear and reusable functions for common inventory policy calculations such as reorder point, safety stock, EOQ, min/max levels, lead-time demand helpers, service-level-based threshold planning, and policy summary helpers.
+The `inventory` package provides clear and reusable functions for common inventory policy calculations such as reorder point, safety stock, EOQ, min/max levels, lead-time demand helpers, service-level-based threshold planning, and policy summary helpers.
 
 The goal is to keep the API:
 
@@ -16,9 +16,13 @@ The goal is to keep the API:
 - practical
 - easy to embed in Go applications
 
+## Stability
+
+The `inventory` package is released as `v1.0.0` and is intended to provide a stable public API for practical inventory policy calculations.
+
 ## Current Scope
 
-As of `v0.6.0`, the `inventory` package includes:
+As of `v1.0.0`, the `inventory` package includes:
 
 - `ReorderPoint`
 - `SafetyStockBasic`
@@ -50,7 +54,7 @@ The package is intentionally small, explicit, and easy to embed.
 ## Installation
 
 ```bash
-go get github.com/motah-fard/scmgo
+go get github.com/motah-fard/scmgo/inventory@latest
 ```
 
 ## Package
@@ -316,16 +320,8 @@ This project follows semantic versioning.
 - `v0.3.x` added lead-time demand and variability helpers
 - `v0.4.0` added target inventory level and service-level policy helpers
 - `v0.5.0` added policy summary helpers and improved API consistency for inventory planning workflows
-- `v0.6.0` focuses on documentation tightening, package consistency, and API stabilization ahead of `v1.0.0`
-
-## Roadmap
-
-Planned future improvements may include:
-
-- final API stabilization toward `v1.0.0`
-- richer examples and documentation
-- broader supply-chain planning utilities
-- additional demand and replenishment helpers
+- `v0.6.0` focused on documentation tightening, package consistency, and API stabilization ahead of `v1.0.0`
+- `v1.0.0` is the first stable release of the `inventory` package
 
 ## Documentation
 

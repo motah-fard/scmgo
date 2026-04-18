@@ -1,7 +1,7 @@
 // Package inventory provides practical inventory policy calculations for
-// basic supply chain and stock management use cases.
+// inventory control and supply chain planning.
 //
-// Version v0.6.0 includes:
+// Version v1.0.0 includes:
 //
 //   - Reorder point
 //   - Basic safety stock
