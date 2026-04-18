@@ -1,13 +1,13 @@
 package inventory
 
 // TargetInventoryLevelWithServiceLevel calculates target inventory level using
-// expected demand during lead time and safety stock based on a target cycle
-// service level.
+// expected demand coverage and safety stock based on a target cycle service level.
 //
 // Formula:
 //
-//	target inventory level = expected demand during lead time + safety stock
+//	target inventory level = expected demand coverage + safety stock
 //
+// In this helper, expected demand coverage is calculated over lead time.
 // All input values must be non-negative, and service level must be
 // strictly between 0 and 1.
 func TargetInventoryLevelWithServiceLevel(in TargetInventoryLevelWithServiceLevelInput) (float64, error) {

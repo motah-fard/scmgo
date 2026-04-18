@@ -94,3 +94,31 @@ type MinMaxLevelsWithServiceLevelInput struct {
 	ServiceLevel      float64
 	OrderQuantity     float64
 }
+
+// PolicySummary contains the main outputs of an inventory policy calculation.
+type PolicySummary struct {
+	ExpectedDemandDuringLeadTime float64
+	SafetyStockUnits             float64
+	ReorderPoint                 float64
+	TargetInventoryLevel         float64
+	MinLevel                     float64
+	MaxLevel                     float64
+}
+
+// PolicySummaryInput contains deterministic inputs for a policy summary calculation.
+type PolicySummaryInput struct {
+	DailyDemand      float64
+	LeadTimeDays     float64
+	ReviewPeriodDays float64
+	SafetyStockUnits float64
+}
+
+// PolicySummaryServiceLevelInput contains service-level-driven inputs
+// for a policy summary calculation.
+type PolicySummaryServiceLevelInput struct {
+	DailyDemand        float64
+	LeadTimeDays       float64
+	ReviewPeriodDays   float64
+	DemandStdDevPerDay float64
+	ServiceLevel       float64
+}

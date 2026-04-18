@@ -6,6 +6,7 @@ import "math"
 // corresponding to the given cycle service level.
 //
 // The service level must be strictly between 0 and 1.
+//
 // Examples:
 //   - 0.90  -> 1.2816
 //   - 0.95  -> 1.6449

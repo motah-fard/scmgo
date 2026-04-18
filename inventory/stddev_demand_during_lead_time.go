@@ -7,6 +7,7 @@ import "math"
 //
 //	standard deviation during lead time = standard deviation of daily demand × sqrt(lead time days)
 //
+// This assumes independent daily demand variability across lead-time periods.
 // All input values must be non-negative.
 func StdDevDemandDuringLeadTime(in StdDevDemandDuringLeadTimeInput) (float64, error) {
 	if in.StdDevDailyDemand < 0 {

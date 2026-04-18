@@ -7,8 +7,8 @@ package inventory
 // where safety stock is computed from demand variability, lead time,
 // and the target cycle service level.
 //
-// All input values must be non-negative, and service level must be
-// strictly between 0 and 1.
+// All demand and lead-time inputs must be non-negative. Service level must be
+// strictly between 0 and 1, as validated by SafetyStockWithServiceLevel.
 func ReorderPointWithServiceLevel(in ReorderPointWithServiceLevelInput) (float64, error) {
 	if in.AvgDailyDemand < 0 {
 		return 0, ErrNegativeDemand

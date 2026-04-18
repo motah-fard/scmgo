@@ -1,6 +1,6 @@
 package inventory
 
-// DemandDuringLeadTime calculates expected demand during lead time using:
+// DemandDuringLeadTime calculates expected demand coverage over lead time using:
 //
 //	demand during lead time = average daily demand × lead time days
 //

@@ -5,6 +5,7 @@ package inventory
 //	safety stock = (max daily demand × max lead time days) -
 //	               (average daily demand × average lead time days)
 //
+// If the calculated result is negative, the function returns 0.
 // All input values must be non-negative.
 func SafetyStockBasic(in SafetyStockInput) (float64, error) {
 	if in.MaxDailyDemand < 0 {

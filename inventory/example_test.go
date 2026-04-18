@@ -178,3 +178,46 @@ func ExampleMinMaxLevelsWithServiceLevel() {
 	fmt.Printf("min=%.2f max=%.2f\n", levels.Min, levels.Max)
 	// Output: min=232.90 max=432.90
 }
+
+func ExampleBuildPolicySummary() {
+	summary, err := BuildPolicySummary(PolicySummaryInput{
+		DailyDemand:      100,
+		LeadTimeDays:     5,
+		ReviewPeriodDays: 7,
+		SafetyStockUnits: 50,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("ROP: %.0f, Target: %.0f\n", summary.ReorderPoint, summary.TargetInventoryLevel)
+	// Output:
+	// ROP: 550, Target: 1250
+}
+
+func ExampleBuildPolicySummaryWithServiceLevel() {
+	summary, err := BuildPolicySummaryWithServiceLevel(PolicySummaryServiceLevelInput{
+		DailyDemand:        100,
+		LeadTimeDays:       5,
+		ReviewPeriodDays:   7,
+		DemandStdDevPerDay: 20,
+		ServiceLevel:       0.95,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf(
+		"Expected lead-time demand: %.0f, Safety stock: %.2f, ROP: %.2f, Target: %.2f, Min: %.2f, Max: %.2f\n",
+		summary.ExpectedDemandDuringLeadTime,
+		summary.SafetyStockUnits,
+		summary.ReorderPoint,
+		summary.TargetInventoryLevel,
+		summary.MinLevel,
+		summary.MaxLevel,
+	)
+	// Output:
+	// Expected lead-time demand: 500, Safety stock: 73.56, ROP: 573.56, Target: 1273.56, Min: 573.56, Max: 1273.56
+}

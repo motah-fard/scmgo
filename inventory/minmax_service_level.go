@@ -8,8 +8,8 @@ package inventory
 //	min level = reorder point with service level
 //	max level = min level + order quantity
 //
-// All input values must be non-negative, and service level must be
-// strictly between 0 and 1.
+// All quantity inputs must be non-negative. Service level must be
+// strictly between 0 and 1, as validated by ReorderPointWithServiceLevel.
 func MinMaxLevelsWithServiceLevel(in MinMaxLevelsWithServiceLevelInput) (MinMaxResult, error) {
 	if in.OrderQuantity < 0 {
 		return MinMaxResult{}, ErrNegativeOrderQuantity

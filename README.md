@@ -7,7 +7,7 @@
 
 `scmgo` is a Go library for practical inventory and supply-chain calculations.
 
-The first package, `inventory`, provides clear and reusable functions for common inventory policy calculations such as reorder point, safety stock, EOQ, min/max levels, lead-time demand helpers, and service-level-based threshold planning.
+The first package, `inventory`, provides clear and reusable functions for common inventory policy calculations such as reorder point, safety stock, EOQ, min/max levels, lead-time demand helpers, service-level-based threshold planning, and policy summary helpers.
 
 The goal is to keep the API:
 
@@ -18,7 +18,7 @@ The goal is to keep the API:
 
 ## Current Scope
 
-As of `v0.4.0`, the `inventory` package includes:
+As of `v0.5.0`, the `inventory` package includes:
 
 - `ReorderPoint`
 - `SafetyStockBasic`
@@ -32,6 +32,8 @@ As of `v0.4.0`, the `inventory` package includes:
 - `TargetInventoryLevel`
 - `TargetInventoryLevelWithServiceLevel`
 - `MinMaxLevelsWithServiceLevel`
+- `BuildPolicySummary`
+- `BuildPolicySummaryWithServiceLevel`
 
 ## Why scmgo
 
@@ -70,18 +72,62 @@ import (
 )
 
 func main() {
-	rp, err := inventory.ReorderPoint(inventory.ReorderPointInput{
-		AvgDailyDemand:   100,
+	summary, err := inventory.BuildPolicySummary(inventory.PolicySummaryInput{
+		DailyDemand:      100,
 		LeadTimeDays:     5,
+		ReviewPeriodDays: 7,
 		SafetyStockUnits: 50,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("reorder point: %.0f\n", rp)
+	fmt.Printf("reorder point: %.0f\n", summary.ReorderPoint)
+	fmt.Printf("target level: %.0f\n", summary.TargetInventoryLevel)
 }
 ```
+
+## Policy Summary Helpers
+
+These helpers provide a higher-level API for common inventory planning workflows. They are useful when you want one call to return the main planning outputs instead of assembling them manually from several lower-level functions.
+
+### Deterministic Policy Summary
+
+Builds a policy summary from average demand, lead time, review period, and fixed safety stock.
+
+```go
+summary, err := inventory.BuildPolicySummary(inventory.PolicySummaryInput{
+	DailyDemand:      100,
+	LeadTimeDays:     5,
+	ReviewPeriodDays: 7,
+	SafetyStockUnits: 50,
+})
+```
+
+Returned fields include:
+
+- expected demand during lead time
+- safety stock
+- reorder point
+- target inventory level
+- min level
+- max level
+
+### Service-Level Policy Summary
+
+Builds a policy summary using service-level-based reorder point logic and demand variability.
+
+```go
+summary, err := inventory.BuildPolicySummaryWithServiceLevel(inventory.PolicySummaryServiceLevelInput{
+	DailyDemand:        100,
+	LeadTimeDays:       5,
+	ReviewPeriodDays:   7,
+	DemandStdDevPerDay: 20,
+	ServiceLevel:       0.95,
+})
+```
+
+This is useful for dashboards, reorder recommendations, and embedded inventory planning logic where service-level assumptions matter.
 
 ## Available Functions
 
@@ -243,6 +289,7 @@ The package validates inputs and returns explicit errors for invalid values such
 - negative demand
 - negative expected demand
 - negative lead time
+- negative review period
 - negative safety stock
 - invalid service level
 - negative standard deviation
@@ -257,6 +304,7 @@ This keeps behavior predictable and makes the library easier to integrate into l
 - EOQ uses the classic Wilson EOQ formula
 - Service-level calculations assume a normal approximation
 - `SafetyStockBasic` uses a simple max/average demand and lead-time formula
+- Policy summary helpers combine lead-time coverage, review-period coverage, and min/max outputs into a single result
 
 ## Versioning
 
@@ -265,16 +313,17 @@ This project follows semantic versioning.
 - `v0.1.x` focused on core deterministic inventory formulas
 - `v0.2.x` added service-level-based inventory calculations
 - `v0.3.x` added lead-time demand and variability helpers
-- `v0.4.0` adds target inventory level and service-level policy helpers
+- `v0.4.0` added target inventory level and service-level policy helpers
+- `v0.5.0` adds policy summary helpers and improves API consistency for inventory planning workflows
 
 ## Roadmap
 
 Planned future improvements may include:
 
-- additional demand and lead-time helpers
-- more service-level-based inventory functions
-- broader supply-chain planning utilities
+- continued API stabilization toward `v1.0.0`
 - richer examples and documentation
+- broader supply-chain planning utilities
+- additional demand and replenishment helpers
 
 ## Documentation
 

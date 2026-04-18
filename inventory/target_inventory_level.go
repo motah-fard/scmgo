@@ -2,8 +2,10 @@ package inventory
 
 // TargetInventoryLevel calculates target inventory level using:
 //
-//	target inventory level = expected demand during lead time + safety stock
+//	target inventory level = expected demand coverage + safety stock
 //
+// The ExpectedDemandDuringLeadTime input typically represents expected demand
+// over the replenishment protection period used by the caller.
 // All input values must be non-negative.
 func TargetInventoryLevel(in TargetInventoryLevelInput) (float64, error) {
 	if in.ExpectedDemandDuringLeadTime < 0 {

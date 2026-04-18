@@ -12,6 +12,8 @@ package inventory
 //	standard deviation of demand during lead time =
 //	standard deviation of daily demand × sqrt(lead time days)
 //
+// This helper assumes a normal approximation and independent daily demand
+// variability across lead-time periods.
 // All input values must be non-negative, and service level must be
 // strictly between 0 and 1.
 func SafetyStockWithServiceLevel(in SafetyStockWithServiceLevelInput) (float64, error) {

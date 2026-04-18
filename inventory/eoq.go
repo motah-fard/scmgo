@@ -6,7 +6,7 @@ import "math"
 //
 //	EOQ = sqrt((2 × annual demand × ordering cost) / holding cost per unit)
 //
-// Annual demand and ordering cost must be non-negative.
+// Annual demand and ordering cost must be non-negative values.
 // Holding cost per unit must be greater than zero.
 func EOQ(in EOQInput) (float64, error) {
 	if in.AnnualDemand < 0 {
