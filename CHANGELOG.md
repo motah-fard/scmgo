@@ -2,12 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.6.0] - 2026-04-18
+### Improved
+- reviewed naming consistency across the `inventory` package
+- tightened exported comments and package documentation for clarity and consistency
+- aligned README wording with current package semantics and assumptions
+- clarified target inventory level wording around expected demand coverage
+- refined package documentation for policy summary helpers and service-level-based calculations
+- performed package consistency review ahead of `v1.0.0`
+- kept the public API stable while improving documentation and overall polish
+
 ## [v0.5.0] - 2026-04-18
 ### Added
 - `PolicySummary` for consolidated inventory policy outputs
 - `PolicySummaryInput` for deterministic policy summary calculations
 - `PolicySummaryServiceLevelInput` for service-level-driven policy summary calculations
-- `BuildPolicySummary` for computing expected lead-time demand, safety stock, reorder point, target inventory level, min level, and max level in one call
+- `BuildPolicySummary` for computing expected lead-time demand, safety stock, reorder point, target inventory level, and min/max levels in one call
 - `BuildPolicySummaryWithServiceLevel` for computing policy summaries using service-level-based reorder point logic
 - examples for deterministic and service-level policy summary workflows
 - test coverage for policy summary builders
@@ -20,7 +30,7 @@ All notable changes to this project will be documented in this file.
 
 ## [v0.4.0] - 2026-04-16
 ### Added
-- `TargetInventoryLevel` for calculating target inventory level from expected demand and safety stock
+- `TargetInventoryLevel` for calculating target inventory level from expected demand coverage and safety stock
 - `TargetInventoryLevelWithServiceLevel` for calculating target inventory level using service-level-based safety stock
 - `MinMaxLevelsWithServiceLevel` for calculating min/max inventory levels using a service-level-based reorder point
 

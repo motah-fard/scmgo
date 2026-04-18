@@ -1,20 +1,20 @@
 // Package inventory provides practical inventory policy calculations for
 // basic supply chain and stock management use cases.
 //
-// Version v0.5.0 includes:
+// Version v0.6.0 includes:
 //
 //   - Reorder point
 //   - Basic safety stock
 //   - Economic order quantity (EOQ)
 //   - Min/max inventory levels
 //   - Z-score lookup for service levels
-//   - Safety stock based on service level
-//   - Reorder point based on service level
+//   - Service-level-based safety stock
+//   - Service-level-based reorder point
 //   - Demand during lead time
 //   - Standard deviation of demand during lead time
 //   - Target inventory level
-//   - Target inventory level based on service level
-//   - Min/max levels based on service level
+//   - Service-level-based target inventory level
+//   - Service-level-based min/max inventory levels
 //   - Deterministic policy summary helpers
 //   - Service-level-based policy summary helpers
 //
@@ -29,8 +29,8 @@
 //   - Safety stock is expressed in inventory units.
 //   - EOQ uses the classic Wilson EOQ formula.
 //   - SafetyStockBasic uses a simple max/average demand and lead-time formula.
-//   - SafetyStockWithServiceLevel assumes a normal approximation and uses
-//     demand variability together with a target cycle service level.
+//   - SafetyStockWithServiceLevel assumes a normal approximation and combines
+//     demand variability with a target cycle service level.
 //   - ReorderPointWithServiceLevel combines expected lead-time demand with
 //     service-level-based safety stock.
 //   - StdDevDemandDuringLeadTime assumes independent demand variability

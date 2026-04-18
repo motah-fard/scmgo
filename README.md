@@ -1,7 +1,7 @@
 # scmgo
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/motah-fard/scmgo/inventory.svg)](https://pkg.go.dev/github.com/motah-fard/scmgo/inventory)
-[![License](https://img.shields.io/github/license/motah-fard/scmgo)](https://github.com/motah-fard/scmgo/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/github.com/motah-fard/scmgo)](https://github.com/motah-fard/scmgo/blob/main/LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/motah-fard/scmgo)](https://github.com/motah-fard/scmgo/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/motah-fard/scmgo)](https://goreportcard.com/report/github.com/motah-fard/scmgo)
 
@@ -18,7 +18,7 @@ The goal is to keep the API:
 
 ## Current Scope
 
-As of `v0.5.0`, the `inventory` package includes:
+As of `v0.6.0`, the `inventory` package includes:
 
 - `ReorderPoint`
 - `SafetyStockBasic`
@@ -236,7 +236,7 @@ sd, err := inventory.StdDevDemandDuringLeadTime(inventory.StdDevDemandDuringLead
 
 ### Target Inventory Level
 
-Calculates target inventory level from expected demand during lead time and safety stock.
+Calculates target inventory level from expected demand coverage and safety stock.
 
 ```go
 level, err := inventory.TargetInventoryLevel(inventory.TargetInventoryLevelInput{
@@ -304,7 +304,8 @@ This keeps behavior predictable and makes the library easier to integrate into l
 - EOQ uses the classic Wilson EOQ formula
 - Service-level calculations assume a normal approximation
 - `SafetyStockBasic` uses a simple max/average demand and lead-time formula
-- Policy summary helpers combine lead-time coverage, review-period coverage, and min/max outputs into a single result
+- `StdDevDemandDuringLeadTime` assumes independent daily demand variability across lead-time periods
+- Policy summary helpers combine lead-time coverage, review-period coverage, safety stock, reorder point, target inventory level, and min/max outputs into a single result
 
 ## Versioning
 
@@ -314,13 +315,14 @@ This project follows semantic versioning.
 - `v0.2.x` added service-level-based inventory calculations
 - `v0.3.x` added lead-time demand and variability helpers
 - `v0.4.0` added target inventory level and service-level policy helpers
-- `v0.5.0` adds policy summary helpers and improves API consistency for inventory planning workflows
+- `v0.5.0` added policy summary helpers and improved API consistency for inventory planning workflows
+- `v0.6.0` focuses on documentation tightening, package consistency, and API stabilization ahead of `v1.0.0`
 
 ## Roadmap
 
 Planned future improvements may include:
 
-- continued API stabilization toward `v1.0.0`
+- final API stabilization toward `v1.0.0`
 - richer examples and documentation
 - broader supply-chain planning utilities
 - additional demand and replenishment helpers
