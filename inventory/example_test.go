@@ -221,3 +221,22 @@ func ExampleBuildPolicySummaryWithServiceLevel() {
 	// Output:
 	// Expected lead-time demand: 500, Safety stock: 73.56, ROP: 573.56, Target: 1273.56, Min: 573.56, Max: 1273.56
 }
+
+func ExampleBuildPolicySummaryBatch() {
+	results := BuildPolicySummaryBatch([]PolicySummaryInput{
+		{DailyDemand: 100, LeadTimeDays: 5, ReviewPeriodDays: 7, SafetyStockUnits: 50},
+		{DailyDemand: -1, LeadTimeDays: 5, ReviewPeriodDays: 7, SafetyStockUnits: 50},
+	})
+
+	for _, r := range results {
+		if r.Err != nil {
+			fmt.Printf("item %d: error: %v\n", r.Index, r.Err)
+			continue
+		}
+		fmt.Printf("item %d: ROP=%.0f\n", r.Index, r.Summary.ReorderPoint)
+	}
+	// Output:
+	// item 0: ROP=550
+	// item 1: error: invalid policy summary input
+	// demand cannot be negative
+}

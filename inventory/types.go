@@ -122,3 +122,16 @@ type PolicySummaryServiceLevelInput struct {
 	DemandStdDevPerDay float64
 	ServiceLevel       float64
 }
+
+// PolicySummaryBatchResult pairs the outcome of one item in a policy
+// summary batch with its position in the input slice, so a failure on one
+// item (e.g. one bad SKU row) doesn't prevent inspecting the rest.
+type PolicySummaryBatchResult struct {
+	// Index is the position of this result in the input slice.
+	Index int
+	// Summary is the computed policy summary. It is the zero value if Err
+	// is non-nil.
+	Summary PolicySummary
+	// Err is the error returned for this item, or nil on success.
+	Err error
+}

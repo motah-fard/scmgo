@@ -1,7 +1,7 @@
 // Package inventory provides practical inventory policy calculations for
 // inventory control and supply chain planning.
 //
-// Version v1.0.0 includes:
+// It includes:
 //
 //   - Reorder point
 //   - Basic safety stock
@@ -17,6 +17,7 @@
 //   - Service-level-based min/max inventory levels
 //   - Deterministic policy summary helpers
 //   - Service-level-based policy summary helpers
+//   - Batch variants of the policy summary helpers for SKU lists
 //
 // The formulas in this package are intentionally simple and transparent.
 // They are designed for practical use in applications, internal tools,
@@ -39,6 +40,8 @@
 //   - Policy summary helpers combine lead-time demand, review-period demand,
 //     safety stock, reorder point, target inventory level, and min/max outputs
 //     into one higher-level result.
-//   - This package does not include forecasting, stochastic optimization,
-//     multi-echelon inventory models, or fill-rate-based service models.
+//   - This package does not include demand forecasting (see the sibling
+//     github.com/motah-fard/scmgo/forecast package), stochastic
+//     optimization, multi-echelon inventory models, or fill-rate-based
+//     service models.
 package inventory
