@@ -2,22 +2,22 @@ package forecast
 
 import "math"
 
-// ForecastAccuracy calculates common forecast accuracy metrics (MAD, MAPE,
+// Accuracy calculates common forecast accuracy metrics (MAD, MAPE,
 // Bias, RMSE) from a period-aligned actual/forecast series pair. See
-// ForecastAccuracyResult for the definition of each metric, including how
+// AccuracyResult for the definition of each metric, including how
 // MAPE handles zero actual values.
-func ForecastAccuracy(in ForecastAccuracyInput) (ForecastAccuracyResult, error) {
+func Accuracy(in AccuracyInput) (AccuracyResult, error) {
 	if len(in.Actual) == 0 {
-		return ForecastAccuracyResult{}, ErrEmptyHistory
+		return AccuracyResult{}, ErrEmptyHistory
 	}
 	if len(in.Actual) != len(in.Forecast) {
-		return ForecastAccuracyResult{}, ErrMismatchedLengths
+		return AccuracyResult{}, ErrMismatchedLengths
 	}
 	if err := validateFiniteSlice(in.Actual); err != nil {
-		return ForecastAccuracyResult{}, err
+		return AccuracyResult{}, err
 	}
 	if err := validateFiniteSlice(in.Forecast); err != nil {
-		return ForecastAccuracyResult{}, err
+		return AccuracyResult{}, err
 	}
 
 	var (
@@ -47,7 +47,7 @@ func ForecastAccuracy(in ForecastAccuracyInput) (ForecastAccuracyResult, error) 
 		mape = mapeSum / float64(mapeCount)
 	}
 
-	return ForecastAccuracyResult{
+	return AccuracyResult{
 		MAD:  absSum / n,
 		MAPE: mape,
 		Bias: signedSum / n,

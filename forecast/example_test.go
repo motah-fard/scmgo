@@ -74,8 +74,8 @@ func ExampleCroston() {
 	// Output: 1.51
 }
 
-func ExampleForecastAccuracy() {
-	result, err := ForecastAccuracy(ForecastAccuracyInput{
+func ExampleAccuracy() {
+	result, err := Accuracy(AccuracyInput{
 		Actual:   []float64{100, 110, 95, 130},
 		Forecast: []float64{90, 115, 100, 120},
 	})

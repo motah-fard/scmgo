@@ -37,7 +37,7 @@ type SimpleExponentialSmoothingResult struct {
 	Forecast float64
 	// Fitted contains the in-sample fitted (one-step-ahead) forecast for
 	// each period in History, useful for computing forecast accuracy with
-	// ForecastAccuracy.
+	// Accuracy.
 	Fitted []float64
 }
 
@@ -91,9 +91,9 @@ type CrostonResult struct {
 	Forecast float64
 }
 
-// ForecastAccuracyInput contains the inputs required to calculate forecast
+// AccuracyInput contains the inputs required to calculate forecast
 // accuracy metrics.
-type ForecastAccuracyInput struct {
+type AccuracyInput struct {
 	// Actual is the chronological series of actual observed values.
 	Actual []float64
 	// Forecast is the chronological series of forecast values, aligned
@@ -101,9 +101,9 @@ type ForecastAccuracyInput struct {
 	Forecast []float64
 }
 
-// ForecastAccuracyResult contains forecast accuracy metrics computed from
+// AccuracyResult contains forecast accuracy metrics computed from
 // an actual/forecast series pair.
-type ForecastAccuracyResult struct {
+type AccuracyResult struct {
 	// MAD is the mean absolute deviation: mean(|actual - forecast|).
 	MAD float64
 	// MAPE is the mean absolute percentage error, expressed as a fraction

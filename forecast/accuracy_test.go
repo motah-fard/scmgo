@@ -5,24 +5,24 @@ import (
 	"testing"
 )
 
-func TestForecastAccuracy(t *testing.T) {
+func TestAccuracy(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		name      string
-		input     ForecastAccuracyInput
-		want      ForecastAccuracyResult
+		input     AccuracyInput
+		want      AccuracyResult
 		wantNaN   bool
 		tolerance float64
 		wantErr   error
 	}{
 		{
 			name: "valid input",
-			input: ForecastAccuracyInput{
+			input: AccuracyInput{
 				Actual:   []float64{100, 110, 95, 130},
 				Forecast: []float64{90, 115, 100, 120},
 			},
-			want: ForecastAccuracyResult{
+			want: AccuracyResult{
 				MAD:  7.5,
 				MAPE: 0.0687523003312477,
 				Bias: 2.5,
@@ -32,11 +32,11 @@ func TestForecastAccuracy(t *testing.T) {
 		},
 		{
 			name: "zero actual excluded from MAPE",
-			input: ForecastAccuracyInput{
+			input: AccuracyInput{
 				Actual:   []float64{0, 10},
 				Forecast: []float64{5, 8},
 			},
-			want: ForecastAccuracyResult{
+			want: AccuracyResult{
 				MAD:  3.5,
 				MAPE: 0.2,
 				Bias: -1.5,
@@ -46,11 +46,11 @@ func TestForecastAccuracy(t *testing.T) {
 		},
 		{
 			name: "all actuals zero yields NaN MAPE",
-			input: ForecastAccuracyInput{
+			input: AccuracyInput{
 				Actual:   []float64{0, 0},
 				Forecast: []float64{5, 8},
 			},
-			want: ForecastAccuracyResult{
+			want: AccuracyResult{
 				MAD:  6.5,
 				Bias: -6.5,
 				RMSE: math.Sqrt((25 + 64) / 2.0),
@@ -60,7 +60,7 @@ func TestForecastAccuracy(t *testing.T) {
 		},
 		{
 			name: "empty actual",
-			input: ForecastAccuracyInput{
+			input: AccuracyInput{
 				Actual:   []float64{},
 				Forecast: []float64{},
 			},
@@ -68,7 +68,7 @@ func TestForecastAccuracy(t *testing.T) {
 		},
 		{
 			name: "mismatched lengths",
-			input: ForecastAccuracyInput{
+			input: AccuracyInput{
 				Actual:   []float64{1, 2},
 				Forecast: []float64{1},
 			},
@@ -76,7 +76,7 @@ func TestForecastAccuracy(t *testing.T) {
 		},
 		{
 			name: "NaN in actual",
-			input: ForecastAccuracyInput{
+			input: AccuracyInput{
 				Actual:   []float64{100, math.NaN()},
 				Forecast: []float64{90, 100},
 			},
@@ -84,7 +84,7 @@ func TestForecastAccuracy(t *testing.T) {
 		},
 		{
 			name: "Inf in forecast",
-			input: ForecastAccuracyInput{
+			input: AccuracyInput{
 				Actual:   []float64{100, 110},
 				Forecast: []float64{90, math.Inf(1)},
 			},
@@ -97,31 +97,31 @@ func TestForecastAccuracy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := ForecastAccuracy(tt.input)
+			got, err := Accuracy(tt.input)
 			if err != tt.wantErr {
-				t.Fatalf("ForecastAccuracy() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("Accuracy() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if err != nil {
 				return
 			}
 
 			if !almostEqual(got.MAD, tt.want.MAD, tt.tolerance) {
-				t.Fatalf("ForecastAccuracy() MAD = %v, want %v", got.MAD, tt.want.MAD)
+				t.Fatalf("Accuracy() MAD = %v, want %v", got.MAD, tt.want.MAD)
 			}
 			if !almostEqual(got.Bias, tt.want.Bias, tt.tolerance) {
-				t.Fatalf("ForecastAccuracy() Bias = %v, want %v", got.Bias, tt.want.Bias)
+				t.Fatalf("Accuracy() Bias = %v, want %v", got.Bias, tt.want.Bias)
 			}
 			if !almostEqual(got.RMSE, tt.want.RMSE, tt.tolerance) {
-				t.Fatalf("ForecastAccuracy() RMSE = %v, want %v", got.RMSE, tt.want.RMSE)
+				t.Fatalf("Accuracy() RMSE = %v, want %v", got.RMSE, tt.want.RMSE)
 			}
 			if tt.wantNaN {
 				if !math.IsNaN(got.MAPE) {
-					t.Fatalf("ForecastAccuracy() MAPE = %v, want NaN", got.MAPE)
+					t.Fatalf("Accuracy() MAPE = %v, want NaN", got.MAPE)
 				}
 				return
 			}
 			if !almostEqual(got.MAPE, tt.want.MAPE, tt.tolerance) {
-				t.Fatalf("ForecastAccuracy() MAPE = %v, want %v", got.MAPE, tt.want.MAPE)
+				t.Fatalf("Accuracy() MAPE = %v, want %v", got.MAPE, tt.want.MAPE)
 			}
 		})
 	}
