@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- CI workflow (build, vet, gofmt check, race-enabled tests, golangci-lint) on push/PR
+- `CONTRIBUTING.md` documenting the package pattern for new formulas/packages
+- `CODE_OF_CONDUCT.md`
+- GitHub issue templates (bug report, feature request) and PR template
+- `.gitignore`
+
+### Fixed
+- `go.mod` directive order (`module` before `go`) and relaxed the pinned Go
+  version from `1.25.1` to `1.23` so the module builds on older toolchains
+
 ## [v1.0.0] - 2026-04-18
 ### Added
 - first stable release of the `inventory` package
