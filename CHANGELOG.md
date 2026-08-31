@@ -6,16 +6,33 @@ All notable changes to this project will be documented in this file.
 ### Added
 - `forecast` package: `MovingAverage`, `WeightedMovingAverage`,
   `SimpleExponentialSmoothing`, `HoltLinearTrend`, `Croston`,
-  `ForecastAccuracy` (MAD, MAPE, Bias, RMSE), with full test coverage and
+  `Accuracy` (MAD, MAPE, Bias, RMSE), with full test coverage and
   runnable examples
 - `inventory.BuildPolicySummaryBatch` and
   `inventory.BuildPolicySummaryWithServiceLevelBatch` for computing policy
   summaries across a list of SKUs without one bad row aborting the batch
-- CI workflow (build, vet, gofmt check, race-enabled tests, golangci-lint) on push/PR
+- CI workflow (build, vet, gofmt check, race-enabled tests, golangci-lint,
+  a short fuzzing pass per target) on push/PR
 - `CONTRIBUTING.md` documenting the package pattern for new formulas/packages
 - `CODE_OF_CONDUCT.md`
+- `SECURITY.md`
 - GitHub issue templates (bug report, feature request) and PR template
 - `.gitignore`
+- Fuzz targets (`FuzzEOQ`, `FuzzZScoreForServiceLevel`, `FuzzBuildPolicySummary*`
+  in `inventory`; `FuzzMovingAverage`, `FuzzWeightedMovingAverage`,
+  `FuzzHoltLinearTrend`, `FuzzCroston`, `FuzzAccuracy` in `forecast`),
+  asserting no panic and no undocumented `NaN` leaking through with a `nil`
+  error
+- Benchmarks for the functions most likely to sit in a hot path (`EOQ`,
+  `BuildPolicySummary*`, `MovingAverage`, `SimpleExponentialSmoothing`,
+  `HoltLinearTrend`)
+
+### Changed
+- **Breaking (pre-release only):** renamed `forecast.ForecastAccuracy` /
+  `ForecastAccuracyInput` / `ForecastAccuracyResult` to `Accuracy` /
+  `AccuracyInput` / `AccuracyResult` to fix a package-name stutter flagged
+  by `golangci-lint`/revive. Done now because `forecast` has not shipped in
+  a tagged release yet.
 
 ### Fixed
 - `go.mod` directive order (`module` before `go`) and relaxed the pinned Go
@@ -27,6 +44,10 @@ All notable changes to this project will be documented in this file.
   poisoned `NaN`/`Inf` result with a `nil` error instead of failing. All
   `float64` inputs across both packages are now checked with a new
   `ErrNonFiniteInput` before any other validation.
+- `.golangci.yml` was in v1 format; `golangci-lint-action@v6` with
+  `version: latest` now installs golangci-lint v2, which refuses a v1
+  config outright. The lint CI job would have failed on the first push.
+  Migrated to v2 config format.
 
 ## [v1.0.0] - 2026-04-18
 ### Added

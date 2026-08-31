@@ -62,6 +62,13 @@ Conventions to follow:
    not just the happy path.
 7. **Every exported function gets a runnable `Example`.** These double as
    documentation on pkg.go.dev and as regression tests via `// Output:`.
+8. **A function that takes arbitrary `float64` input gets a fuzz target**
+   (see `inventory/fuzz_test.go`, `forecast/fuzz_test.go`). At minimum it
+   must assert no panic; if you can prove from the formula that valid input
+   can never produce `NaN` output (no unguarded division, no `Erfinv`/`Sqrt`
+   over an unbounded range), assert that too — that's the exact class of
+   bug `validateFinite` exists to catch, and a fuzz target is what proves
+   the fix and guards against it coming back.
 
 ## Before opening a PR
 
@@ -70,6 +77,14 @@ go build ./...
 go vet ./...
 gofmt -l .        # must print nothing
 go test ./... -race -cover
+golangci-lint run ./...   # requires golangci-lint v2; `go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest`
+```
+
+If you added a fuzz target, run it for at least a few seconds before opening
+the PR — CI only budgets 15s per target, which won't find everything:
+
+```bash
+go test ./<package>/... -run=NONE -fuzz='^FuzzYourTarget$' -fuzztime=30s
 ```
 
 Then update:

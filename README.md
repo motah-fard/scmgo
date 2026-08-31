@@ -55,7 +55,7 @@ provisional until the next version tag.
 - `SimpleExponentialSmoothing`
 - `HoltLinearTrend`
 - `Croston`
-- `ForecastAccuracy`
+- `Accuracy`
 
 ## Why scmgo
 
@@ -378,7 +378,7 @@ result, err := forecast.Croston(forecast.CrostonInput{
 ### Forecast Accuracy
 
 ```go
-result, err := forecast.ForecastAccuracy(forecast.ForecastAccuracyInput{
+result, err := forecast.Accuracy(forecast.AccuracyInput{
 	Actual:   []float64{100, 110, 95, 130},
 	Forecast: []float64{90, 115, 100, 120},
 })
@@ -397,7 +397,11 @@ result, err := forecast.ForecastAccuracy(forecast.ForecastAccuracyInput{
 
 ## Error Handling
 
-Every package validates inputs and returns explicit sentinel errors for invalid values instead of panicking — e.g. negative demand, negative lead time, invalid service level, invalid smoothing constant, mismatched series lengths. See each package's `errors.go` for the full list. This keeps behavior predictable and makes the library easier to integrate into larger systems.
+Every package validates inputs and returns explicit sentinel errors for invalid values instead of panicking — e.g. negative demand, negative lead time, invalid service level, invalid smoothing constant, mismatched series lengths, and non-finite (`NaN`/`Inf`) values. See each package's `errors.go` for the full list. This keeps behavior predictable and makes the library easier to integrate into larger systems.
+
+Validation always checks finiteness first: a plain `v < 0` check is a silent no-op against `NaN` in IEEE 754 (any comparison against `NaN` is `false`), so every function checks `NaN`/`Inf` explicitly before any range check — otherwise a bad upstream value (e.g. from a division by zero elsewhere in a caller's pipeline) would silently produce a poisoned `NaN`/`Inf` result with a `nil` error instead of failing loudly. Both packages have fuzz targets (`go test ./... -fuzz=...`) that assert this — see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+See [SECURITY.md](SECURITY.md) for the project's security scope and how to report an issue.
 
 ## Assumptions
 
@@ -416,7 +420,7 @@ Every package validates inputs and returns explicit sentinel errors for invalid 
 - History series are chronological, oldest value first, with non-negative demand
 - Smoothing constants (Alpha, Beta) must be in `(0, 1]`
 - Croston treats zero as "no demand" and requires at least one non-zero period
-- `ForecastAccuracy`'s MAPE excludes periods where the actual value is zero, and is `NaN` if every actual value is zero
+- `Accuracy`'s MAPE excludes periods where the actual value is zero, and is `NaN` if every actual value is zero
 
 Full assumptions and exclusions are documented in each package's `doc.go`.
 
@@ -451,6 +455,7 @@ This project follows semantic versioning.
 - Go package docs: [pkg.go.dev/github.com/motah-fard/scmgo/inventory](https://pkg.go.dev/github.com/motah-fard/scmgo/inventory), [pkg.go.dev/github.com/motah-fard/scmgo/forecast](https://pkg.go.dev/github.com/motah-fard/scmgo/forecast)
 - Releases: [github.com/motah-fard/scmgo/releases](https://github.com/motah-fard/scmgo/releases)
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Security policy: [SECURITY.md](SECURITY.md)
 
 ## License
 
