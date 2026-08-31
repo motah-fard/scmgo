@@ -23,9 +23,9 @@ The goal is to keep the API:
 ## Stability
 
 The `inventory` package's public API is stable as of `v1.0.0`. The `forecast`
-package is new and, while tested to the same standard, has not yet had a
-major version release — expect it to reach the same stability guarantee at
-the module's next major version.
+package is new and, while tested to the same standard (see [Current Scope](#current-scope)),
+has not yet shipped in a tagged release — its API should be considered
+provisional until the next version tag.
 
 ## Current Scope
 
