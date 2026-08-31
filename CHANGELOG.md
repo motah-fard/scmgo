@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added (inventory extensions)
+- `SafetyStockWithVariableLeadTime` / `ReorderPointWithVariableLeadTime` —
+  account for lead-time variability, not just demand variability; reduces
+  to the existing fixed-lead-time formulas when lead-time variability is 0
+- `UnitNormalLoss`, `ExpectedFillRate`, `FillRateSafetyStock` — fill-rate
+  (P2) safety stock in both directions, closing the gap `doc.go` previously
+  listed as excluded. `FillRateSafetyStock` inverts the unit normal loss
+  function numerically (bisection, since it has no closed-form inverse)
+- `EPQ` — economic production quantity
+- `EOQWithQuantityDiscounts` — cost-minimizing order quantity across a
+  price-break schedule; verified against a known textbook example
+- `Newsvendor` — single-period optimal order quantity
+- `Turnover`, `DaysOfInventoryOnHand`, `GMROI` — standard inventory ratios
+
+All ship with table-driven tests (values verified independently in Python
+before being encoded as Go expectations), runnable examples, and fuzz
+targets.
+
+### Fixed (found while building the above)
+- **`UnitNormalLoss` catastrophic cancellation for large `z`.** Computing
+  `1 - Φ(z)` as `1 - (1 + Erf(...))/2` loses precision once `Φ(z)` rounds to
+  exactly 1 in float64 (around `z ≈ 6`), silently dropping the entire tail
+  term instead of erroring. Caught by a round-trip test
+  (`FillRateSafetyStock` → `ExpectedFillRate` should recover the original
+  target) that a plain "not NaN" check would have missed, since the result
+  was finite, just wrong. Fixed with `math.Erfc`, which computes the tail
+  directly without subtracting two nearly-equal numbers.
+- `ExpectedFillRate` rejected negative `SafetyStockUnits`, but
+  `FillRateSafetyStock` can legitimately return a negative value for a low
+  target fill rate — the two were inconsistent. Removed the restriction;
+  negative safety stock is mathematically valid in this model.
+- A test-data copy-paste error (wrong expected value carried over from an
+  unrelated test case) in `SafetyStockWithVariableLeadTime`'s test table.
+- Naming stutter: `InventoryTurnover`/`InventoryTurnoverInput` renamed to
+  `Turnover`/`TurnoverInput` (caught by golangci-lint/revive) before this
+  shipped in any tagged release.
+
 ### Changed
 - **Clean Code pass:** eliminated the DRY violation across both packages'
   `validate_internal.go` (near-identical files, both wrapping the same

@@ -240,3 +240,173 @@ func ExampleBuildPolicySummaryBatch() {
 	// item 1: error: invalid policy summary input
 	// demand cannot be negative
 }
+
+func ExampleSafetyStockWithVariableLeadTime() {
+	ss, err := SafetyStockWithVariableLeadTime(SafetyStockWithVariableLeadTimeInput{
+		AvgDailyDemand:     100,
+		StdDevDailyDemand:  10,
+		AvgLeadTimeDays:    5,
+		StdDevLeadTimeDays: 1,
+		ServiceLevel:       0.95,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.2f\n", ss)
+	// Output: 168.55
+}
+
+func ExampleReorderPointWithVariableLeadTime() {
+	rp, err := ReorderPointWithVariableLeadTime(ReorderPointWithVariableLeadTimeInput{
+		AvgDailyDemand:     100,
+		StdDevDailyDemand:  10,
+		AvgLeadTimeDays:    5,
+		StdDevLeadTimeDays: 1,
+		ServiceLevel:       0.95,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.2f\n", rp)
+	// Output: 668.55
+}
+
+func ExampleUnitNormalLoss() {
+	loss, err := UnitNormalLoss(1)
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.4f\n", loss)
+	// Output: 0.0833
+}
+
+func ExampleExpectedFillRate() {
+	fillRate, err := ExpectedFillRate(ExpectedFillRateInput{
+		SafetyStockUnits:           50,
+		StdDevDemandDuringLeadTime: 50,
+		OrderQuantity:              200,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.4f\n", fillRate)
+	// Output: 0.9792
+}
+
+func ExampleFillRateSafetyStock() {
+	ss, err := FillRateSafetyStock(FillRateSafetyStockInput{
+		TargetFillRate:             0.98,
+		StdDevDemandDuringLeadTime: 50,
+		OrderQuantity:              200,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.2f\n", ss)
+	// Output: 51.06
+}
+
+func ExampleEPQ() {
+	epq, err := EPQ(EPQInput{
+		AnnualDemand:         10000,
+		SetupCost:            50,
+		HoldingCostPerUnit:   2,
+		AnnualProductionRate: 40000,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.2f\n", epq)
+	// Output: 816.50
+}
+
+func ExampleEOQWithQuantityDiscounts() {
+	result, err := EOQWithQuantityDiscounts(EOQWithQuantityDiscountsInput{
+		AnnualDemand:    10000,
+		OrderingCost:    20,
+		HoldingCostRate: 0.20,
+		Tiers: []QuantityDiscountTier{
+			{MinQuantity: 1, UnitPrice: 5.00},
+			{MinQuantity: 500, UnitPrice: 4.50},
+			{MinQuantity: 1000, UnitPrice: 3.90},
+		},
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("qty=%.0f price=%.2f totalCost=%.2f\n", result.OrderQuantity, result.UnitPrice, result.TotalAnnualCost)
+	// Output: qty=1000 price=3.90 totalCost=39590.00
+}
+
+func ExampleNewsvendor() {
+	result, err := Newsvendor(NewsvendorInput{
+		MeanDemand:          500,
+		StdDevDemand:        100,
+		UnderageCostPerUnit: 18,
+		OverageCostPerUnit:  7,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("Q=%.2f criticalRatio=%.2f\n", result.OrderQuantity, result.CriticalRatio)
+	// Output: Q=558.28 criticalRatio=0.72
+}
+
+func ExampleTurnover() {
+	turnover, err := Turnover(TurnoverInput{
+		COGS:                  120000,
+		AverageInventoryValue: 20000,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.1f\n", turnover)
+	// Output: 6.0
+}
+
+func ExampleDaysOfInventoryOnHand() {
+	days, err := DaysOfInventoryOnHand(DaysOfInventoryOnHandInput{
+		AverageInventoryValue: 20000,
+		COGS:                  120000,
+		DaysInPeriod:          365,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.1f\n", days)
+	// Output: 60.8
+}
+
+func ExampleGMROI() {
+	gmroi, err := GMROI(GMROIInput{
+		GrossMargin:          50000,
+		AverageInventoryCost: 20000,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.2f\n", gmroi)
+	// Output: 2.50
+}

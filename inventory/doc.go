@@ -18,6 +18,14 @@
 //   - Deterministic policy summary helpers
 //   - Service-level-based policy summary helpers
 //   - Batch variants of the policy summary helpers for SKU lists
+//   - Safety stock and reorder point accounting for variable lead time
+//   - Fill-rate (item fill rate / P2) safety stock, both directions:
+//     expected fill rate from a given safety stock, and the safety stock
+//     required for a target fill rate
+//   - Economic production quantity (EPQ)
+//   - Economic order quantity across a quantity discount schedule
+//   - Newsvendor (single-period) optimal order quantity
+//   - Inventory turnover, days of inventory on hand, and GMROI
 //
 // The formulas in this package are intentionally simple and transparent.
 // They are designed for practical use in applications, internal tools,
@@ -42,8 +50,22 @@
 //   - Policy summary helpers combine lead-time demand, review-period demand,
 //     safety stock, reorder point, target inventory level, and min/max outputs
 //     into one higher-level result.
+//   - SafetyStockWithVariableLeadTime accounts for variability in both
+//     demand and lead time; it reduces to SafetyStockWithServiceLevel when
+//     lead-time variability is zero.
+//   - ExpectedFillRate and FillRateSafetyStock assume a normal
+//     approximation of demand during lead time. FillRateSafetyStock's
+//     result can be negative for a low enough target fill rate (see its
+//     doc comment) -- this is not a bug, and ExpectedFillRate accepts a
+//     negative safety stock accordingly.
+//   - EOQWithQuantityDiscounts evaluates each price tier's own EOQ,
+//     clamped to that tier's valid quantity range, and returns whichever
+//     tier/quantity combination minimizes total annual cost.
 //   - This package does not include demand forecasting (see the sibling
 //     github.com/motah-fard/scmgo/forecast package), stochastic
-//     optimization, multi-echelon inventory models, or fill-rate-based
-//     service models.
+//     optimization, or multi-echelon inventory models (a guaranteed-service
+//     multi-echelon model requires network topology and NP-hard
+//     optimization over a DAG of stocking locations -- a fundamentally
+//     different kind of problem from the closed-form/numerically-inverted
+//     formulas in this package, not a planned extension of it).
 package inventory

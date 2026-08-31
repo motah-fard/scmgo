@@ -73,9 +73,20 @@ Conventions to follow:
 6. **Tests are table-driven** with `tolerance`-based float comparisons (see
    `almostEqual` in `inventory/eoq_test.go`), and cover every error branch,
    not just the happy path.
-7. **Every exported function gets a runnable `Example`.** These double as
+7. **Verify test expectations independently before encoding them as Go
+   assertions.** Compute them in a second tool (Python, a calculator, a
+   textbook example) rather than deriving them by hand and trusting that
+   derivation. This isn't optional box-ticking: it's how a real
+   catastrophic-cancellation bug in `UnitNormalLoss` (silently wrong for
+   large `z`, not caught by "no panic" fuzzing) and a copy-paste error in a
+   test table were both caught during development, before either shipped.
+   If a function has a forward and inverse direction (like
+   `ExpectedFillRate`/`FillRateSafetyStock`), a round-trip test is a
+   stronger check than either direction alone — it catches precision bugs
+   that a plain "not NaN" assertion won't.
+8. **Every exported function gets a runnable `Example`.** These double as
    documentation on pkg.go.dev and as regression tests via `// Output:`.
-8. **A function that takes arbitrary `float64` input gets a fuzz target**
+9. **A function that takes arbitrary `float64` input gets a fuzz target**
    (see `inventory/fuzz_test.go`, `forecast/fuzz_test.go`). At minimum it
    must assert no panic; if you can prove from the formula that valid input
    can never produce `NaN` output (no unguarded division, no `Erfinv`/`Sqrt`

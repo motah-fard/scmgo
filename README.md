@@ -47,6 +47,17 @@ provisional until the next version tag.
 - `BuildPolicySummaryWithServiceLevel`
 - `BuildPolicySummaryBatch`
 - `BuildPolicySummaryWithServiceLevelBatch`
+- `SafetyStockWithVariableLeadTime`
+- `ReorderPointWithVariableLeadTime`
+- `UnitNormalLoss`
+- `ExpectedFillRate`
+- `FillRateSafetyStock`
+- `EPQ`
+- `EOQWithQuantityDiscounts`
+- `Newsvendor`
+- `Turnover`
+- `DaysOfInventoryOnHand`
+- `GMROI`
 
 ### `forecast`
 
@@ -313,6 +324,42 @@ levels, err := inventory.MinMaxLevelsWithServiceLevel(inventory.MinMaxLevelsWith
 })
 ```
 
+## Beyond Cycle Service Level
+
+A few functions extend `inventory` past the fixed-lead-time, cycle-service-level
+model used elsewhere in this section. Full parameter details are in each
+function's doc comment and runnable `Example` on pkg.go.dev.
+
+```go
+// Safety stock and reorder point when lead time varies too, not just demand.
+ss, err := inventory.SafetyStockWithVariableLeadTime(inventory.SafetyStockWithVariableLeadTimeInput{
+	AvgDailyDemand: 100, StdDevDailyDemand: 10,
+	AvgLeadTimeDays: 5, StdDevLeadTimeDays: 1,
+	ServiceLevel: 0.95,
+})
+
+// Fill rate (P2, % of demand met from stock) instead of cycle service level.
+ss, err = inventory.FillRateSafetyStock(inventory.FillRateSafetyStockInput{
+	TargetFillRate: 0.98, StdDevDemandDuringLeadTime: 50, OrderQuantity: 200,
+})
+
+// Economic order quantity across a price-break schedule.
+result, err := inventory.EOQWithQuantityDiscounts(inventory.EOQWithQuantityDiscountsInput{
+	AnnualDemand: 10000, OrderingCost: 20, HoldingCostRate: 0.20,
+	Tiers: []inventory.QuantityDiscountTier{
+		{MinQuantity: 1, UnitPrice: 5.00},
+		{MinQuantity: 500, UnitPrice: 4.50},
+		{MinQuantity: 1000, UnitPrice: 3.90},
+	},
+})
+
+// Single-period optimal order quantity (newsvendor model).
+nv, err := inventory.Newsvendor(inventory.NewsvendorInput{
+	MeanDemand: 500, StdDevDemand: 100,
+	UnderageCostPerUnit: 18, OverageCostPerUnit: 7,
+})
+```
+
 ## Forecasting
 
 The `forecast` package estimates demand from historical data — output that
@@ -414,6 +461,9 @@ See [SECURITY.md](SECURITY.md) for the project's security scope and how to repor
 - `SafetyStockBasic` uses a simple max/average demand and lead-time formula
 - `StdDevDemandDuringLeadTime` assumes independent daily demand variability across lead-time periods
 - Policy summary helpers combine lead-time coverage, review-period coverage, safety stock, reorder point, target inventory level, and min/max outputs into a single result
+- `SafetyStockWithVariableLeadTime` reduces to `SafetyStockWithServiceLevel` when lead-time variability is zero
+- `FillRateSafetyStock`'s result can be negative for a low enough target fill rate — that's not a bug; `ExpectedFillRate` accepts a negative safety stock accordingly
+- `EOQWithQuantityDiscounts` evaluates each price tier's own EOQ clamped to that tier's valid range, and returns whichever tier/quantity minimizes total annual cost
 
 **`forecast`**
 
@@ -431,11 +481,22 @@ pattern as `inventory` and `forecast` (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 Not yet started — contributions and formula proposals (with a citation) are
 welcome via issues.
 
-- **`procurement`** — economic production quantity (EPQ), quantity-discount EOQ, landed cost
 - **`abc`** — ABC/XYZ classification and Pareto analysis for prioritizing inventory attention
-- **`fillrate`** — fill-rate-based (as opposed to cycle) service-level safety stock
-- **`multiecho`** — multi-echelon safety stock and allocation
-- **`logistics`** — freight consolidation and transportation cost allocation
+- **`procurement`** — landed cost, purchase price variance, total cost of ownership
+- **`production`** — BOM explosion, lot sizing, OEE, Little's Law
+- **`logistics`** — freight cost allocation, dimensional weight, center-of-gravity facility location
+- **`warehouse`** — storage/cube utilization, pick rate, slotting
+- **`quality`** — DPMO, process capability (Cp/Cpk), cost of quality
+- **`finance`** — cash-to-cash cycle time, perfect order rate
+
+**Explicitly not planned:** a general multi-echelon safety stock/allocation
+package. The guaranteed-service multi-echelon model needs network topology
+and NP-hard optimization over a DAG of stocking locations — a fundamentally
+different kind of problem from the closed-form/numerically-inverted formulas
+elsewhere in this library, not an extension of them. `EOQ` with quantity
+discounts and fill-rate safety stock (both closed-form/numerical, not
+network problems) already shipped in `inventory` rather than waiting for a
+`procurement`/`fillrate` package.
 
 ## Versioning
 
