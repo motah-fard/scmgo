@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added (abc package)
+- New `abc` package: `Classify` (ABC/Pareto classification by cumulative
+  value contribution), `ClassifyVariability` (XYZ classification by demand
+  coefficient of variation), and `Combine` (joins both into the classic
+  ABC-XYZ matrix). `Classify` returns results in input order (not resorted
+  by value), so it stays index-aligned with `ClassifyVariability` for the
+  same item set. Full tests, examples, and fuzz targets.
+
 ### Added (inventory extensions)
 - `SafetyStockWithVariableLeadTime` / `ReorderPointWithVariableLeadTime` —
   account for lead-time variability, not just demand variability; reduces

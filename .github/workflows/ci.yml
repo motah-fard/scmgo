@@ -77,7 +77,7 @@ jobs:
       - name: Fuzz each target briefly
         run: |
           set -e
-          for pkg in ./inventory/... ./forecast/...; do
+          for pkg in $(go list ./...); do
             for name in $(go test "$pkg" -list '^Fuzz' | grep '^Fuzz'); do
               echo "::group::$pkg $name"
               go test "$pkg" -run=NONE -fuzz="^${name}\$" -fuzztime=15s

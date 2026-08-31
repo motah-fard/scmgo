@@ -8,8 +8,9 @@
 
 `scmgo` is a Go library for practical supply-chain calculations, organized as one package per domain.
 
-- **`inventory`** — reorder point, safety stock, EOQ, min/max levels, lead-time demand helpers, service-level-based threshold planning, and policy summary helpers (including batch helpers for SKU lists).
+- **`inventory`** — reorder point, safety stock (fixed and variable lead time), EOQ (plain, quantity-discount, and production-quantity variants), fill-rate and cycle-service-level models, newsvendor, min/max levels, lead-time demand helpers, inventory ratios, and policy summary helpers (including batch helpers for SKU lists).
 - **`forecast`** — demand forecasting to feed the `inventory` package's inputs: moving average, weighted moving average, simple exponential smoothing, Holt's linear trend, Croston's method for intermittent demand, and forecast accuracy metrics (MAD, MAPE, Bias, RMSE).
+- **`abc`** — ABC (Pareto) classification by value concentration, XYZ classification by demand variability, and combining the two into the classic ABC-XYZ matrix.
 
 See [Roadmap](#roadmap) for planned packages.
 
@@ -23,9 +24,12 @@ The goal is to keep the API:
 ## Stability
 
 The `inventory` package's public API is stable as of `v1.0.0`. The `forecast`
-package is new and, while tested to the same standard (see [Current Scope](#current-scope)),
-has not yet shipped in a tagged release — its API should be considered
-provisional until the next version tag.
+and `abc` packages are new and, while tested to the same standard (see
+[Current Scope](#current-scope)), have not yet shipped in a tagged release —
+their APIs should be considered provisional until the next version tag.
+Recent additions to `inventory` itself (everything under
+[Beyond Cycle Service Level](#beyond-cycle-service-level)) are likewise
+unreleased and could still change before the next tag.
 
 ## Current Scope
 
@@ -68,6 +72,12 @@ provisional until the next version tag.
 - `Croston`
 - `Accuracy`
 
+### `abc`
+
+- `Classify`
+- `ClassifyVariability`
+- `Combine`
+
 ## Why scmgo
 
 Many inventory and supply-chain calculations still live in spreadsheets, internal notes, or one-off scripts. `scmgo` provides a lightweight Go-native alternative for developers building:
@@ -85,12 +95,14 @@ The package is intentionally small, explicit, and easy to embed.
 ```bash
 go get github.com/motah-fard/scmgo/inventory@latest
 go get github.com/motah-fard/scmgo/forecast@latest
+go get github.com/motah-fard/scmgo/abc@latest
 ```
 
 ## Packages
 
 - `github.com/motah-fard/scmgo/inventory`
 - `github.com/motah-fard/scmgo/forecast`
+- `github.com/motah-fard/scmgo/abc`
 
 ## Quick Start
 
@@ -432,6 +444,32 @@ result, err := forecast.Accuracy(forecast.AccuracyInput{
 // result.MAD, result.MAPE, result.Bias, result.RMSE
 ```
 
+## Classification
+
+The `abc` package prioritizes which SKUs deserve tighter inventory control:
+ABC classification by value concentration, XYZ classification by demand
+variability, and combining both into the classic ABC-XYZ matrix.
+
+```go
+import "github.com/motah-fard/scmgo/abc"
+
+results, err := abc.Classify(abc.ClassifyInput{
+	Items: []abc.Item{
+		{ID: "sku-1", Value: 8000},
+		{ID: "sku-2", Value: 2000},
+	},
+	AThreshold: 0.80, // cumulative value cutoff for class A
+	BThreshold: 0.95, // cumulative value cutoff for class B
+})
+// results[i].Class is "A", "B", or "C"; results[i].CumulativePercent is
+// the Pareto curve value at that item -- there's no separate "Pareto
+// analysis" function since this cumulative-percent field is exactly that.
+```
+
+`Classify`'s result stays in the same order as the input `Items` (not
+resorted by value), so it's index-aligned with `ClassifyVariability`'s
+result for the same item set and easy to feed into `Combine`.
+
 ## Design Principles
 
 `scmgo` is intentionally designed to be:
@@ -472,16 +510,22 @@ See [SECURITY.md](SECURITY.md) for the project's security scope and how to repor
 - Croston treats zero as "no demand" and requires at least one non-zero period
 - `Accuracy`'s MAPE excludes periods where the actual value is zero, and is `NaN` if every actual value is zero
 
+**`abc`**
+
+- `Classify` returns results in input order, not resorted by value, so it stays index-aligned with `ClassifyVariability` for the same item set
+- `Classify` requires item values to be non-negative and sum to more than zero (cumulative percent is undefined for an all-zero set)
+- `ClassifyVariability` requires `MeanDemand` to be strictly positive (the coefficient of variation is undefined at mean zero)
+- `Combine` is an inner join on ID: an item present in only one input is omitted, not defaulted
+
 Full assumptions and exclusions are documented in each package's `doc.go`.
 
 ## Roadmap
 
 Planned packages, each following the same Input-struct/validate/sentinel-error
-pattern as `inventory` and `forecast` (see [CONTRIBUTING.md](CONTRIBUTING.md)).
+pattern as `inventory`, `forecast`, and `abc` (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 Not yet started — contributions and formula proposals (with a citation) are
 welcome via issues.
 
-- **`abc`** — ABC/XYZ classification and Pareto analysis for prioritizing inventory attention
 - **`procurement`** — landed cost, purchase price variance, total cost of ownership
 - **`production`** — BOM explosion, lot sizing, OEE, Little's Law
 - **`logistics`** — freight cost allocation, dimensional weight, center-of-gravity facility location
@@ -509,11 +553,11 @@ This project follows semantic versioning.
 - `v0.5.0` added policy summary helpers and improved API consistency for inventory planning workflows
 - `v0.6.0` focused on documentation tightening, package consistency, and API stabilization ahead of `v1.0.0`
 - `v1.0.0` is the first stable release of the `inventory` package
-- `Unreleased` adds the `forecast` package and batch policy-summary helpers; see [CHANGELOG.md](CHANGELOG.md)
+- `Unreleased` adds the `forecast` and `abc` packages, several `inventory` extensions (variable-lead-time and fill-rate safety stock, EPQ, quantity-discount EOQ, newsvendor, inventory ratios), and batch policy-summary helpers; see [CHANGELOG.md](CHANGELOG.md)
 
 ## Documentation
 
-- Go package docs: [pkg.go.dev/github.com/motah-fard/scmgo/inventory](https://pkg.go.dev/github.com/motah-fard/scmgo/inventory), [pkg.go.dev/github.com/motah-fard/scmgo/forecast](https://pkg.go.dev/github.com/motah-fard/scmgo/forecast)
+- Go package docs: [pkg.go.dev/github.com/motah-fard/scmgo/inventory](https://pkg.go.dev/github.com/motah-fard/scmgo/inventory), [pkg.go.dev/github.com/motah-fard/scmgo/forecast](https://pkg.go.dev/github.com/motah-fard/scmgo/forecast), [pkg.go.dev/github.com/motah-fard/scmgo/abc](https://pkg.go.dev/github.com/motah-fard/scmgo/abc)
 - Releases: [github.com/motah-fard/scmgo/releases](https://github.com/motah-fard/scmgo/releases)
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Security policy: [SECURITY.md](SECURITY.md)
