@@ -11,6 +11,7 @@
 - **`inventory`** — reorder point, safety stock (fixed and variable lead time), EOQ (plain, quantity-discount, and production-quantity variants), fill-rate and cycle-service-level models, newsvendor, min/max levels, lead-time demand helpers, inventory ratios, and policy summary helpers (including batch helpers for SKU lists).
 - **`forecast`** — demand forecasting to feed the `inventory` package's inputs: moving average, weighted moving average, simple exponential smoothing, Holt's linear trend, Croston's method for intermittent demand, and forecast accuracy metrics (MAD, MAPE, Bias, RMSE).
 - **`abc`** — ABC (Pareto) classification by value concentration, XYZ classification by demand variability, and combining the two into the classic ABC-XYZ matrix.
+- **`procurement`** — landed cost, purchase price variance, and total cost of ownership.
 
 See [Roadmap](#roadmap) for planned packages.
 
@@ -82,6 +83,12 @@ unreleased and could still change before the next tag.
 - `ClassifyVariability`
 - `Combine`
 
+### `procurement`
+
+- `LandedCost`
+- `PurchasePriceVariance`
+- `TotalCostOfOwnership`
+
 ## Why scmgo
 
 Many inventory and supply-chain calculations still live in spreadsheets, internal notes, or one-off scripts. `scmgo` provides a lightweight Go-native alternative for developers building:
@@ -100,6 +107,7 @@ The package is intentionally small, explicit, and easy to embed.
 go get github.com/motah-fard/scmgo/inventory@latest
 go get github.com/motah-fard/scmgo/forecast@latest
 go get github.com/motah-fard/scmgo/abc@latest
+go get github.com/motah-fard/scmgo/procurement@latest
 ```
 
 ## Packages
@@ -107,6 +115,7 @@ go get github.com/motah-fard/scmgo/abc@latest
 - `github.com/motah-fard/scmgo/inventory`
 - `github.com/motah-fard/scmgo/forecast`
 - `github.com/motah-fard/scmgo/abc`
+- `github.com/motah-fard/scmgo/procurement`
 
 ## Quick Start
 

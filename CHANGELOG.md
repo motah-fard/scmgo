@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added (procurement package)
+- New `procurement` package: `LandedCost` and `TotalCostOfOwnership` (sum
+  labeled, possibly-negative cost components — deliberately not hardcoding
+  a fixed category list, since it varies too much by industry) and
+  `PurchasePriceVariance` (standard-costing convention: positive = favorable).
+  Full tests, examples, fuzz targets; 100% coverage.
+
 ### Added (forecast extensions)
 - `HoltWinters` — additive-seasonality triple exponential smoothing; one
   documented initialization convention (see its doc comment), since none is
