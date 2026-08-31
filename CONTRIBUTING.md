@@ -26,24 +26,37 @@ as:
   doc.go              # package doc comment: scope, assumptions, what's excluded
   types.go            # exported Input/Result structs
   errors.go           # sentinel errors (errors.New), one per validation failure
+  validate_internal.go # unexported validation helpers for this package
   <formula>.go         # one exported function per file, named after the formula
   <formula>_test.go    # table-driven tests: valid cases + every error branch
   example_test.go      # one runnable Example<Func> per exported function
+  fuzz_test.go          # fuzz targets, see convention 8 below
+  benchmark_test.go     # optional, for functions likely to sit in a hot path
 ```
+
+The one thing shared *across* packages is `internal/numeric` — pure,
+dependency-free numeric predicates (currently just `AllFinite`) with no
+package-specific error types. If you find yourself about to copy a helper
+from one package's `validate_internal.go` into another's, it probably
+belongs in `internal/numeric` instead.
 
 Conventions to follow:
 
 1. **Inputs are structs, not positional args.** `func EOQ(in EOQInput) (float64, error)`,
    not `func EOQ(demand, orderingCost, holdingCost float64)`. This keeps call
    sites self-documenting and lets us add fields without breaking callers.
-2. **Validate, then compute.** Check every `float64` field with
-   `validateFinite` (see `<package>/validate_internal.go`) *before* any
-   negative/range check — comparisons against `NaN` are always false in
-   IEEE 754, so a plain `v < 0` silently lets `NaN` (and, for one-sided
-   checks, `+Inf`) through, turning a bad upstream value into a silently
-   wrong result instead of an error. Then check domain validity (e.g.
-   non-negative demand, service level strictly between 0 and 1). Return the
-   zero value and a sentinel error on failure — never panic.
+2. **Validate, then compute.** Check every `float64` field in one call to
+   `validateFinite(a, b, c)` (see `<package>/validate_internal.go`, backed by
+   `internal/numeric.AllFinite`) *before* any negative/range check —
+   comparisons against `NaN` are always false in IEEE 754, so a plain
+   `v < 0` silently lets `NaN` (and, for one-sided checks, `+Inf`) through,
+   turning a bad upstream value into a silently wrong result instead of an
+   error. Then check domain validity (e.g. non-negative demand, service
+   level strictly between 0 and 1). Return the zero value and a sentinel
+   error on failure — never panic. `validateFinite` is variadic
+   specifically so a function with several raw fields validates them in one
+   call instead of one `if` block per field — don't reintroduce the
+   per-field version.
 3. **Sentinel errors, reused across functions.** If `ErrNegativeDemand`
    already exists in `errors.go`, reuse it; don't create a near-duplicate.
    Add new sentinels only for genuinely new failure modes. When a function

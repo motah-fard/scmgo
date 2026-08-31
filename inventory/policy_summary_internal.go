@@ -2,24 +2,29 @@ package inventory
 
 import "errors"
 
+// wrapPolicySummaryErr joins err under ErrInvalidPolicySummaryInput so
+// callers can match on either the general or the specific cause via
+// errors.Is.
+func wrapPolicySummaryErr(err error) error {
+	return errors.Join(ErrInvalidPolicySummaryInput, err)
+}
+
 // validatePolicySummaryInput validates deterministic policy summary inputs.
 func validatePolicySummaryInput(input PolicySummaryInput) error {
-	for _, v := range []float64{input.DailyDemand, input.LeadTimeDays, input.ReviewPeriodDays, input.SafetyStockUnits} {
-		if err := validateFinite(v); err != nil {
-			return errors.Join(ErrInvalidPolicySummaryInput, err)
-		}
+	if err := validateFinite(input.DailyDemand, input.LeadTimeDays, input.ReviewPeriodDays, input.SafetyStockUnits); err != nil {
+		return wrapPolicySummaryErr(err)
 	}
 	if input.DailyDemand < 0 {
-		return errors.Join(ErrInvalidPolicySummaryInput, ErrNegativeDemand)
+		return wrapPolicySummaryErr(ErrNegativeDemand)
 	}
 	if input.LeadTimeDays < 0 {
-		return errors.Join(ErrInvalidPolicySummaryInput, ErrNegativeLeadTime)
+		return wrapPolicySummaryErr(ErrNegativeLeadTime)
 	}
 	if input.ReviewPeriodDays < 0 {
-		return errors.Join(ErrInvalidPolicySummaryInput, ErrNegativeReviewPeriod)
+		return wrapPolicySummaryErr(ErrNegativeReviewPeriod)
 	}
 	if input.SafetyStockUnits < 0 {
-		return errors.Join(ErrInvalidPolicySummaryInput, ErrNegativeSafetyStock)
+		return wrapPolicySummaryErr(ErrNegativeSafetyStock)
 	}
 	return nil
 }
@@ -27,25 +32,23 @@ func validatePolicySummaryInput(input PolicySummaryInput) error {
 // validatePolicySummaryServiceLevelInput validates service-level-based
 // policy summary inputs.
 func validatePolicySummaryServiceLevelInput(input PolicySummaryServiceLevelInput) error {
-	for _, v := range []float64{input.DailyDemand, input.LeadTimeDays, input.ReviewPeriodDays, input.DemandStdDevPerDay, input.ServiceLevel} {
-		if err := validateFinite(v); err != nil {
-			return errors.Join(ErrInvalidPolicySummaryInput, err)
-		}
+	if err := validateFinite(input.DailyDemand, input.LeadTimeDays, input.ReviewPeriodDays, input.DemandStdDevPerDay, input.ServiceLevel); err != nil {
+		return wrapPolicySummaryErr(err)
 	}
 	if input.DailyDemand < 0 {
-		return errors.Join(ErrInvalidPolicySummaryInput, ErrNegativeDemand)
+		return wrapPolicySummaryErr(ErrNegativeDemand)
 	}
 	if input.LeadTimeDays < 0 {
-		return errors.Join(ErrInvalidPolicySummaryInput, ErrNegativeLeadTime)
+		return wrapPolicySummaryErr(ErrNegativeLeadTime)
 	}
 	if input.ReviewPeriodDays < 0 {
-		return errors.Join(ErrInvalidPolicySummaryInput, ErrNegativeReviewPeriod)
+		return wrapPolicySummaryErr(ErrNegativeReviewPeriod)
 	}
 	if input.DemandStdDevPerDay < 0 {
-		return errors.Join(ErrInvalidPolicySummaryInput, ErrNegativeStandardDeviation)
+		return wrapPolicySummaryErr(ErrNegativeStandardDeviation)
 	}
 	if input.ServiceLevel <= 0 || input.ServiceLevel >= 1 {
-		return errors.Join(ErrInvalidPolicySummaryInput, ErrInvalidServiceLevel)
+		return wrapPolicySummaryErr(ErrInvalidServiceLevel)
 	}
 	return nil
 }

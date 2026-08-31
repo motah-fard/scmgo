@@ -1,17 +1,12 @@
 package inventory
 
-import "math"
+import "github.com/motah-fard/scmgo/internal/numeric"
 
-// validateFinite returns ErrNonFiniteInput if v is NaN or an infinity.
-//
-// Comparisons against NaN are always false in IEEE 754, so a plain "v < 0"
-// check silently lets NaN (and, for one-sided checks, +Inf) through. Every
-// exported function checks its raw inputs with validateFinite before any
-// other validation, so bad upstream data (e.g. a division by zero that
-// produced NaN) fails loudly instead of propagating as a silently invalid
-// result.
-func validateFinite(v float64) error {
-	if math.IsNaN(v) || math.IsInf(v, 0) {
+// validateFinite returns ErrNonFiniteInput if any value is NaN or an
+// infinity. See internal/numeric.AllFinite for why this check exists and
+// runs before every other validation.
+func validateFinite(values ...float64) error {
+	if !numeric.AllFinite(values...) {
 		return ErrNonFiniteInput
 	}
 	return nil

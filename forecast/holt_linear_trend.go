@@ -19,10 +19,7 @@ func HoltLinearTrend(in HoltLinearTrendInput) (HoltLinearTrendResult, error) {
 	if in.PeriodsAhead <= 0 {
 		return HoltLinearTrendResult{}, ErrInvalidPeriods
 	}
-	if err := validateSmoothingConstant(in.Alpha); err != nil {
-		return HoltLinearTrendResult{}, err
-	}
-	if err := validateSmoothingConstant(in.Beta); err != nil {
+	if err := validateSmoothingConstant(in.Alpha, in.Beta); err != nil {
 		return HoltLinearTrendResult{}, err
 	}
 	if err := validateNonNegative(in.History); err != nil {

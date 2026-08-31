@@ -6,13 +6,7 @@ package inventory
 //
 // All input values must be non-negative.
 func ReorderPoint(in ReorderPointInput) (float64, error) {
-	if err := validateFinite(in.AvgDailyDemand); err != nil {
-		return 0, err
-	}
-	if err := validateFinite(in.LeadTimeDays); err != nil {
-		return 0, err
-	}
-	if err := validateFinite(in.SafetyStockUnits); err != nil {
+	if err := validateFinite(in.AvgDailyDemand, in.LeadTimeDays, in.SafetyStockUnits); err != nil {
 		return 0, err
 	}
 	if in.AvgDailyDemand < 0 {

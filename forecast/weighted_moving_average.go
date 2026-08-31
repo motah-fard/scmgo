@@ -23,7 +23,7 @@ func WeightedMovingAverage(in WeightedMovingAverageInput) (float64, error) {
 	if err := validateNonNegative(in.History); err != nil {
 		return 0, err
 	}
-	if err := validateFiniteSlice(in.Weights); err != nil {
+	if err := validateFinite(in.Weights...); err != nil {
 		return 0, err
 	}
 

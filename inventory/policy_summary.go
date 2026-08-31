@@ -1,7 +1,5 @@
 package inventory
 
-import "errors"
-
 // BuildPolicySummary builds a deterministic inventory policy summary
 // from average demand, lead time, review period, and fixed safety stock.
 //
@@ -17,7 +15,7 @@ func BuildPolicySummary(input PolicySummaryInput) (PolicySummary, error) {
 		LeadTimeDays:   input.LeadTimeDays,
 	})
 	if err != nil {
-		return PolicySummary{}, errors.Join(ErrInvalidPolicySummaryInput, err)
+		return PolicySummary{}, wrapPolicySummaryErr(err)
 	}
 
 	expectedReviewPeriodDemand, err := DemandDuringLeadTime(DemandDuringLeadTimeInput{
@@ -25,7 +23,7 @@ func BuildPolicySummary(input PolicySummaryInput) (PolicySummary, error) {
 		LeadTimeDays:   input.ReviewPeriodDays,
 	})
 	if err != nil {
-		return PolicySummary{}, errors.Join(ErrInvalidPolicySummaryInput, err)
+		return PolicySummary{}, wrapPolicySummaryErr(err)
 	}
 
 	reorderPoint, err := ReorderPoint(ReorderPointInput{
@@ -34,7 +32,7 @@ func BuildPolicySummary(input PolicySummaryInput) (PolicySummary, error) {
 		SafetyStockUnits: input.SafetyStockUnits,
 	})
 	if err != nil {
-		return PolicySummary{}, errors.Join(ErrInvalidPolicySummaryInput, err)
+		return PolicySummary{}, wrapPolicySummaryErr(err)
 	}
 
 	targetLevel, err := TargetInventoryLevel(TargetInventoryLevelInput{
@@ -42,7 +40,7 @@ func BuildPolicySummary(input PolicySummaryInput) (PolicySummary, error) {
 		SafetyStockUnits:             input.SafetyStockUnits,
 	})
 	if err != nil {
-		return PolicySummary{}, errors.Join(ErrInvalidPolicySummaryInput, err)
+		return PolicySummary{}, wrapPolicySummaryErr(err)
 	}
 
 	minMax, err := MinMaxLevels(MinMaxInput{
@@ -50,7 +48,7 @@ func BuildPolicySummary(input PolicySummaryInput) (PolicySummary, error) {
 		OrderQuantity: targetLevel - reorderPoint,
 	})
 	if err != nil {
-		return PolicySummary{}, errors.Join(ErrInvalidPolicySummaryInput, err)
+		return PolicySummary{}, wrapPolicySummaryErr(err)
 	}
 
 	return newPolicySummary(
@@ -78,7 +76,7 @@ func BuildPolicySummaryWithServiceLevel(input PolicySummaryServiceLevelInput) (P
 		LeadTimeDays:   input.LeadTimeDays,
 	})
 	if err != nil {
-		return PolicySummary{}, errors.Join(ErrInvalidPolicySummaryInput, err)
+		return PolicySummary{}, wrapPolicySummaryErr(err)
 	}
 
 	expectedReviewPeriodDemand, err := DemandDuringLeadTime(DemandDuringLeadTimeInput{
@@ -86,7 +84,7 @@ func BuildPolicySummaryWithServiceLevel(input PolicySummaryServiceLevelInput) (P
 		LeadTimeDays:   input.ReviewPeriodDays,
 	})
 	if err != nil {
-		return PolicySummary{}, errors.Join(ErrInvalidPolicySummaryInput, err)
+		return PolicySummary{}, wrapPolicySummaryErr(err)
 	}
 
 	reorderPoint, err := ReorderPointWithServiceLevel(ReorderPointWithServiceLevelInput{
@@ -96,7 +94,7 @@ func BuildPolicySummaryWithServiceLevel(input PolicySummaryServiceLevelInput) (P
 		ServiceLevel:      input.ServiceLevel,
 	})
 	if err != nil {
-		return PolicySummary{}, errors.Join(ErrInvalidPolicySummaryInput, err)
+		return PolicySummary{}, wrapPolicySummaryErr(err)
 	}
 
 	safetyStock := reorderPoint - expectedLeadTimeDemand
@@ -106,7 +104,7 @@ func BuildPolicySummaryWithServiceLevel(input PolicySummaryServiceLevelInput) (P
 		SafetyStockUnits:             safetyStock,
 	})
 	if err != nil {
-		return PolicySummary{}, errors.Join(ErrInvalidPolicySummaryInput, err)
+		return PolicySummary{}, wrapPolicySummaryErr(err)
 	}
 
 	minMax, err := MinMaxLevels(MinMaxInput{
@@ -114,7 +112,7 @@ func BuildPolicySummaryWithServiceLevel(input PolicySummaryServiceLevelInput) (P
 		OrderQuantity: targetLevel - reorderPoint,
 	})
 	if err != nil {
-		return PolicySummary{}, errors.Join(ErrInvalidPolicySummaryInput, err)
+		return PolicySummary{}, wrapPolicySummaryErr(err)
 	}
 
 	return newPolicySummary(

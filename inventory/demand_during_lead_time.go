@@ -6,10 +6,7 @@ package inventory
 //
 // All input values must be non-negative.
 func DemandDuringLeadTime(in DemandDuringLeadTimeInput) (float64, error) {
-	if err := validateFinite(in.AvgDailyDemand); err != nil {
-		return 0, err
-	}
-	if err := validateFinite(in.LeadTimeDays); err != nil {
+	if err := validateFinite(in.AvgDailyDemand, in.LeadTimeDays); err != nil {
 		return 0, err
 	}
 	if in.AvgDailyDemand < 0 {

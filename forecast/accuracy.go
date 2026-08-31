@@ -13,10 +13,10 @@ func Accuracy(in AccuracyInput) (AccuracyResult, error) {
 	if len(in.Actual) != len(in.Forecast) {
 		return AccuracyResult{}, ErrMismatchedLengths
 	}
-	if err := validateFiniteSlice(in.Actual); err != nil {
+	if err := validateFinite(in.Actual...); err != nil {
 		return AccuracyResult{}, err
 	}
-	if err := validateFiniteSlice(in.Forecast); err != nil {
+	if err := validateFinite(in.Forecast...); err != nil {
 		return AccuracyResult{}, err
 	}
 

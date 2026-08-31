@@ -8,16 +8,7 @@ package inventory
 // If the calculated result is negative, the function returns 0.
 // All input values must be non-negative.
 func SafetyStockBasic(in SafetyStockInput) (float64, error) {
-	if err := validateFinite(in.MaxDailyDemand); err != nil {
-		return 0, err
-	}
-	if err := validateFinite(in.MaxLeadTimeDays); err != nil {
-		return 0, err
-	}
-	if err := validateFinite(in.AvgDailyDemand); err != nil {
-		return 0, err
-	}
-	if err := validateFinite(in.AvgLeadTimeDays); err != nil {
+	if err := validateFinite(in.MaxDailyDemand, in.MaxLeadTimeDays, in.AvgDailyDemand, in.AvgLeadTimeDays); err != nil {
 		return 0, err
 	}
 	if in.MaxDailyDemand < 0 {

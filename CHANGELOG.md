@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- **Clean Code pass:** eliminated the DRY violation across both packages'
+  `validate_internal.go` (near-identical files, both wrapping the same
+  NaN/Inf check) by extracting `internal/numeric.AllFinite` and making
+  `validateFinite`/`validateSmoothingConstant` variadic, collapsing what was
+  one `if` block per field into one call per function. Extracted
+  `wrapPolicySummaryErr` to remove 8 repeated `errors.Join(ErrInvalidPolicySummaryInput, err)`
+  call sites in `policy_summary.go`/`policy_summary_internal.go`. No
+  behavior change; verified with the full fuzz/test/lint suite.
+
 ### Added
 - `forecast` package: `MovingAverage`, `WeightedMovingAverage`,
   `SimpleExponentialSmoothing`, `HoltLinearTrend`, `Croston`,
