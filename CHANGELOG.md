@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
+- `forecast` package: `MovingAverage`, `WeightedMovingAverage`,
+  `SimpleExponentialSmoothing`, `HoltLinearTrend`, `Croston`,
+  `ForecastAccuracy` (MAD, MAPE, Bias, RMSE), with full test coverage and
+  runnable examples
+- `inventory.BuildPolicySummaryBatch` and
+  `inventory.BuildPolicySummaryWithServiceLevelBatch` for computing policy
+  summaries across a list of SKUs without one bad row aborting the batch
 - CI workflow (build, vet, gofmt check, race-enabled tests, golangci-lint) on push/PR
 - `CONTRIBUTING.md` documenting the package pattern for new formulas/packages
 - `CODE_OF_CONDUCT.md`

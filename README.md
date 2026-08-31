@@ -1,13 +1,17 @@
 # scmgo
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/motah-fard/scmgo/inventory.svg)](https://pkg.go.dev/github.com/motah-fard/scmgo/inventory)
+[![CI](https://github.com/motah-fard/scmgo/actions/workflows/ci.yml/badge.svg)](https://github.com/motah-fard/scmgo/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/motah-fard/scmgo.svg)](https://pkg.go.dev/github.com/motah-fard/scmgo)
 [![License](https://img.shields.io/github/license/motah-fard/scmgo?color=blue)](https://github.com/motah-fard/scmgo/blob/main/LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/motah-fard/scmgo)](https://github.com/motah-fard/scmgo/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/motah-fard/scmgo)](https://goreportcard.com/report/github.com/motah-fard/scmgo)
 
-`scmgo` is a Go library for practical inventory and supply-chain calculations.
+`scmgo` is a Go library for practical supply-chain calculations, organized as one package per domain.
 
-The `inventory` package provides clear and reusable functions for common inventory policy calculations such as reorder point, safety stock, EOQ, min/max levels, lead-time demand helpers, service-level-based threshold planning, and policy summary helpers.
+- **`inventory`** — reorder point, safety stock, EOQ, min/max levels, lead-time demand helpers, service-level-based threshold planning, and policy summary helpers (including batch helpers for SKU lists).
+- **`forecast`** — demand forecasting to feed the `inventory` package's inputs: moving average, weighted moving average, simple exponential smoothing, Holt's linear trend, Croston's method for intermittent demand, and forecast accuracy metrics (MAD, MAPE, Bias, RMSE).
+
+See [Roadmap](#roadmap) for planned packages.
 
 The goal is to keep the API:
 
@@ -18,11 +22,14 @@ The goal is to keep the API:
 
 ## Stability
 
-The `inventory` package is released as `v1.0.0` and is intended to provide a stable public API for practical inventory policy calculations.
+The `inventory` package's public API is stable as of `v1.0.0`. The `forecast`
+package is new and, while tested to the same standard, has not yet had a
+major version release — expect it to reach the same stability guarantee at
+the module's next major version.
 
 ## Current Scope
 
-As of `v1.0.0`, the `inventory` package includes:
+### `inventory`
 
 - `ReorderPoint`
 - `SafetyStockBasic`
@@ -38,6 +45,17 @@ As of `v1.0.0`, the `inventory` package includes:
 - `MinMaxLevelsWithServiceLevel`
 - `BuildPolicySummary`
 - `BuildPolicySummaryWithServiceLevel`
+- `BuildPolicySummaryBatch`
+- `BuildPolicySummaryWithServiceLevelBatch`
+
+### `forecast`
+
+- `MovingAverage`
+- `WeightedMovingAverage`
+- `SimpleExponentialSmoothing`
+- `HoltLinearTrend`
+- `Croston`
+- `ForecastAccuracy`
 
 ## Why scmgo
 
@@ -55,13 +73,13 @@ The package is intentionally small, explicit, and easy to embed.
 
 ```bash
 go get github.com/motah-fard/scmgo/inventory@latest
+go get github.com/motah-fard/scmgo/forecast@latest
 ```
 
-## Package
-
-Current package:
+## Packages
 
 - `github.com/motah-fard/scmgo/inventory`
+- `github.com/motah-fard/scmgo/forecast`
 
 ## Quick Start
 
@@ -132,6 +150,25 @@ summary, err := inventory.BuildPolicySummaryWithServiceLevel(inventory.PolicySum
 ```
 
 This is useful for dashboards, reorder recommendations, and embedded inventory planning logic where service-level assumptions matter.
+
+### Batch Policy Summaries
+
+`BuildPolicySummaryBatch` and `BuildPolicySummaryWithServiceLevelBatch` run the corresponding single-item helper over a slice of inputs — useful for computing summaries across a full SKU list in one call. Unlike the single-item helpers, one invalid item does not abort the batch: each result carries its own index and error, so you can render the rest of the list and flag the bad row.
+
+```go
+results := inventory.BuildPolicySummaryBatch([]inventory.PolicySummaryInput{
+	{DailyDemand: 100, LeadTimeDays: 5, ReviewPeriodDays: 7, SafetyStockUnits: 50},
+	{DailyDemand: 250, LeadTimeDays: 3, ReviewPeriodDays: 7, SafetyStockUnits: 20},
+})
+
+for _, r := range results {
+	if r.Err != nil {
+		log.Printf("SKU row %d: %v", r.Index, r.Err)
+		continue
+	}
+	fmt.Printf("SKU row %d: ROP=%.0f\n", r.Index, r.Summary.ReorderPoint)
+}
+```
 
 ## Available Functions
 
@@ -276,6 +313,78 @@ levels, err := inventory.MinMaxLevelsWithServiceLevel(inventory.MinMaxLevelsWith
 })
 ```
 
+## Forecasting
+
+The `forecast` package estimates demand from historical data — output that
+feeds directly into `inventory`'s `AvgDailyDemand` / `StdDevDailyDemand`
+inputs.
+
+```go
+import "github.com/motah-fard/scmgo/forecast"
+
+result, err := forecast.SimpleExponentialSmoothing(forecast.SimpleExponentialSmoothingInput{
+	History: []float64{100, 120, 110, 130, 125},
+	Alpha:   0.3,
+})
+```
+
+### Moving Average
+
+```go
+f, err := forecast.MovingAverage(forecast.MovingAverageInput{
+	History: []float64{100, 120, 110, 130, 125},
+	Periods: 3,
+})
+```
+
+### Weighted Moving Average
+
+```go
+f, err := forecast.WeightedMovingAverage(forecast.WeightedMovingAverageInput{
+	History: []float64{100, 120, 110, 130, 125},
+	Weights: []float64{0.1, 0.3, 0.6}, // oldest -> newest, must sum to 1
+})
+```
+
+### Simple Exponential Smoothing
+
+```go
+result, err := forecast.SimpleExponentialSmoothing(forecast.SimpleExponentialSmoothingInput{
+	History: []float64{100, 120, 110, 130, 125},
+	Alpha:   0.3,
+})
+```
+
+### Holt's Linear Trend (Double Exponential Smoothing)
+
+```go
+result, err := forecast.HoltLinearTrend(forecast.HoltLinearTrendInput{
+	History:      []float64{100, 120, 110, 130, 125},
+	Alpha:        0.3,
+	Beta:         0.2,
+	PeriodsAhead: 3,
+})
+```
+
+### Croston's Method (Intermittent Demand)
+
+```go
+result, err := forecast.Croston(forecast.CrostonInput{
+	History: []float64{0, 0, 5, 0, 0, 0, 3, 0, 4, 0},
+	Alpha:   0.2,
+})
+```
+
+### Forecast Accuracy
+
+```go
+result, err := forecast.ForecastAccuracy(forecast.ForecastAccuracyInput{
+	Actual:   []float64{100, 110, 95, 130},
+	Forecast: []float64{90, 115, 100, 120},
+})
+// result.MAD, result.MAPE, result.Bias, result.RMSE
+```
+
 ## Design Principles
 
 `scmgo` is intentionally designed to be:
@@ -288,20 +397,11 @@ levels, err := inventory.MinMaxLevelsWithServiceLevel(inventory.MinMaxLevelsWith
 
 ## Error Handling
 
-The package validates inputs and returns explicit errors for invalid values such as:
-
-- negative demand
-- negative expected demand
-- negative lead time
-- negative review period
-- negative safety stock
-- invalid service level
-- negative standard deviation
-- invalid holding cost
-
-This keeps behavior predictable and makes the library easier to integrate into larger systems.
+Every package validates inputs and returns explicit sentinel errors for invalid values instead of panicking — e.g. negative demand, negative lead time, invalid service level, invalid smoothing constant, mismatched series lengths. See each package's `errors.go` for the full list. This keeps behavior predictable and makes the library easier to integrate into larger systems.
 
 ## Assumptions
+
+**`inventory`**
 
 - Input units must be consistent
 - If demand is measured per day, lead time should also be in days
@@ -310,6 +410,28 @@ This keeps behavior predictable and makes the library easier to integrate into l
 - `SafetyStockBasic` uses a simple max/average demand and lead-time formula
 - `StdDevDemandDuringLeadTime` assumes independent daily demand variability across lead-time periods
 - Policy summary helpers combine lead-time coverage, review-period coverage, safety stock, reorder point, target inventory level, and min/max outputs into a single result
+
+**`forecast`**
+
+- History series are chronological, oldest value first, with non-negative demand
+- Smoothing constants (Alpha, Beta) must be in `(0, 1]`
+- Croston treats zero as "no demand" and requires at least one non-zero period
+- `ForecastAccuracy`'s MAPE excludes periods where the actual value is zero, and is `NaN` if every actual value is zero
+
+Full assumptions and exclusions are documented in each package's `doc.go`.
+
+## Roadmap
+
+Planned packages, each following the same Input-struct/validate/sentinel-error
+pattern as `inventory` and `forecast` (see [CONTRIBUTING.md](CONTRIBUTING.md)).
+Not yet started — contributions and formula proposals (with a citation) are
+welcome via issues.
+
+- **`procurement`** — economic production quantity (EPQ), quantity-discount EOQ, landed cost
+- **`abc`** — ABC/XYZ classification and Pareto analysis for prioritizing inventory attention
+- **`fillrate`** — fill-rate-based (as opposed to cycle) service-level safety stock
+- **`multiecho`** — multi-echelon safety stock and allocation
+- **`logistics`** — freight consolidation and transportation cost allocation
 
 ## Versioning
 
@@ -322,11 +444,13 @@ This project follows semantic versioning.
 - `v0.5.0` added policy summary helpers and improved API consistency for inventory planning workflows
 - `v0.6.0` focused on documentation tightening, package consistency, and API stabilization ahead of `v1.0.0`
 - `v1.0.0` is the first stable release of the `inventory` package
+- `Unreleased` adds the `forecast` package and batch policy-summary helpers; see [CHANGELOG.md](CHANGELOG.md)
 
 ## Documentation
 
-- Go package docs: [pkg.go.dev/github.com/motah-fard/scmgo/inventory](https://pkg.go.dev/github.com/motah-fard/scmgo/inventory)
+- Go package docs: [pkg.go.dev/github.com/motah-fard/scmgo/inventory](https://pkg.go.dev/github.com/motah-fard/scmgo/inventory), [pkg.go.dev/github.com/motah-fard/scmgo/forecast](https://pkg.go.dev/github.com/motah-fard/scmgo/forecast)
 - Releases: [github.com/motah-fard/scmgo/releases](https://github.com/motah-fard/scmgo/releases)
+- Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## License
 
