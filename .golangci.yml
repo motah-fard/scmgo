@@ -1,13 +1,26 @@
-run:
-  timeout: 3m
-
+version: "2"
 linters:
   enable:
-    - govet
-    - staticcheck
-    - errcheck
-    - unused
-    - gofmt
-    - goimports
     - misspell
     - revive
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
