@@ -116,3 +116,87 @@ type AccuracyResult struct {
 	// RMSE is the root mean squared error.
 	RMSE float64
 }
+
+// HoltWintersInput contains the inputs required to calculate a Holt-Winters
+// (triple exponential smoothing, additive seasonality) forecast.
+type HoltWintersInput struct {
+	// History is the chronological demand series, oldest value first. Must
+	// contain at least 2*SeasonLength periods (two full seasons), to
+	// initialize the level, trend, and seasonal components.
+	History []float64
+	// Alpha is the level smoothing constant, in (0, 1].
+	Alpha float64
+	// Beta is the trend smoothing constant, in (0, 1].
+	Beta float64
+	// Gamma is the seasonal smoothing constant, in (0, 1].
+	Gamma float64
+	// SeasonLength is the number of periods per season (e.g. 12 for
+	// monthly data with annual seasonality). Must be at least 2.
+	SeasonLength int
+	// PeriodsAhead is the forecast horizon, in periods, and must be
+	// greater than zero.
+	PeriodsAhead int
+}
+
+// HoltWintersResult contains the outputs of a Holt-Winters calculation.
+type HoltWintersResult struct {
+	// Level is the smoothed level estimate at the end of History.
+	Level float64
+	// Trend is the smoothed trend estimate at the end of History.
+	Trend float64
+	// Seasonal holds the SeasonLength most recent seasonal indices,
+	// indexed by (period position mod SeasonLength).
+	Seasonal []float64
+	// Forecast is the forecast for PeriodsAhead periods beyond the end of
+	// History.
+	Forecast float64
+}
+
+// TrackingSignalInput contains the inputs required to calculate a running
+// tracking signal.
+type TrackingSignalInput struct {
+	// Actual is the chronological series of actual observed values.
+	Actual []float64
+	// Forecast is the chronological series of forecast values, aligned
+	// period-for-period with Actual. Must be the same length as Actual.
+	Forecast []float64
+}
+
+// LinearTrendInput contains the inputs required to calculate a linear
+// regression trend forecast.
+type LinearTrendInput struct {
+	// History is the chronological demand series, oldest value first. At
+	// least two periods are required to fit a trend line.
+	History []float64
+	// PeriodsAhead is the forecast horizon, in periods, and must be
+	// greater than zero.
+	PeriodsAhead int
+}
+
+// LinearTrendResult contains the outputs of a linear regression trend
+// calculation.
+type LinearTrendResult struct {
+	// Slope is the fitted trend's slope (change in value per period).
+	Slope float64
+	// Intercept is the fitted trend's value at period 0 (the first period
+	// in History).
+	Intercept float64
+	// Forecast is the forecast for PeriodsAhead periods beyond the end of
+	// History.
+	Forecast float64
+}
+
+// MASEInput contains the inputs required to calculate the mean absolute
+// scaled error (Hyndman & Koehler, 2006).
+type MASEInput struct {
+	// TrainingHistory is the in-sample series used to compute the naive
+	// one-step-ahead forecast benchmark that scales the error. Must
+	// contain at least two periods.
+	TrainingHistory []float64
+	// Actual is the series of actual values being forecast (in-sample or
+	// out-of-sample).
+	Actual []float64
+	// Forecast is the corresponding forecast values, aligned
+	// period-for-period with Actual. Must be the same length as Actual.
+	Forecast []float64
+}

@@ -13,4 +13,6 @@ var (
 	ErrNoNonZeroDemand          = errors.New("history must contain at least one non-zero demand period")
 	ErrMismatchedLengths        = errors.New("actual and forecast series must have the same length")
 	ErrNonFiniteInput           = errors.New("input values must be finite (not NaN or Inf)")
+	ErrInvalidSeasonLength      = errors.New("season length must be at least 2")
+	ErrZeroNaiveMAE             = errors.New("training history is perfectly constant, so the naive-forecast benchmark used to scale MASE is zero")
 )

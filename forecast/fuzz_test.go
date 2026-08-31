@@ -102,3 +102,65 @@ func FuzzAccuracy(f *testing.F) {
 		}
 	})
 }
+
+func FuzzHoltWinters(f *testing.F) {
+	f.Add(100.0, 120.0, 90.0, 110.0, 105.0, 125.0, 95.0, 115.0, 0.3, 0.1, 0.2, 1)
+	f.Fuzz(func(t *testing.T, a, b, c, d, e, g, h, i, alpha, beta, gamma float64, periodsAhead int) {
+		result, err := HoltWinters(HoltWintersInput{
+			History:      []float64{a, b, c, d, e, g, h, i},
+			Alpha:        alpha,
+			Beta:         beta,
+			Gamma:        gamma,
+			SeasonLength: 4,
+			PeriodsAhead: periodsAhead,
+		})
+		if err == nil && math.IsNaN(result.Forecast) {
+			t.Fatalf("HoltWinters returned NaN forecast with nil error")
+		}
+	})
+}
+
+func FuzzTrackingSignal(f *testing.F) {
+	f.Add(100.0, 110.0, 90.0, 115.0)
+	f.Fuzz(func(t *testing.T, actual1, actual2, forecast1, forecast2 float64) {
+		result, err := TrackingSignal(TrackingSignalInput{
+			Actual:   []float64{actual1, actual2},
+			Forecast: []float64{forecast1, forecast2},
+		})
+		if err != nil {
+			return
+		}
+		for _, v := range result {
+			if math.IsNaN(v) {
+				t.Fatalf("TrackingSignal returned NaN with nil error: %+v", result)
+			}
+		}
+	})
+}
+
+func FuzzLinearTrend(f *testing.F) {
+	f.Add(100.0, 105.0, 108.0, 3)
+	f.Fuzz(func(t *testing.T, a, b, c float64, periodsAhead int) {
+		result, err := LinearTrend(LinearTrendInput{
+			History:      []float64{a, b, c},
+			PeriodsAhead: periodsAhead,
+		})
+		if err == nil && math.IsNaN(result.Forecast) {
+			t.Fatalf("LinearTrend returned NaN forecast with nil error")
+		}
+	})
+}
+
+func FuzzMASE(f *testing.F) {
+	f.Add(100.0, 110.0, 105.0, 125.0, 120.0)
+	f.Fuzz(func(t *testing.T, train1, train2, train3, actual, forecastVal float64) {
+		result, err := MASE(MASEInput{
+			TrainingHistory: []float64{train1, train2, train3},
+			Actual:          []float64{actual},
+			Forecast:        []float64{forecastVal},
+		})
+		if err == nil && math.IsNaN(result) {
+			t.Fatalf("MASE returned NaN with nil error")
+		}
+	})
+}

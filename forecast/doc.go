@@ -10,6 +10,10 @@
 //   - Holt's linear trend method (double exponential smoothing)
 //   - Croston's method for intermittent demand
 //   - Forecast accuracy metrics (MAD, MAPE, Bias, RMSE)
+//   - Holt-Winters (additive seasonality, triple exponential smoothing)
+//   - Running tracking signal, for monitoring forecast drift
+//   - Linear regression trend forecast
+//   - Mean absolute scaled error (MASE)
 //
 // Important assumptions:
 //
@@ -31,6 +35,17 @@
 //     zero (division is undefined) and reports NaN if every actual value is
 //     zero; MAD, Bias, and RMSE are always computed. MAPE and Bias are
 //     signed/expressed as fractions, not percentages (e.g. 0.05 = 5%).
+//   - HoltWinters uses additive seasonality only (not multiplicative), one
+//     documented initialization convention among several found in the
+//     literature (see its doc comment for the exact formulas) -- verify
+//     against your own reference if you need to match a specific textbook
+//     or tool exactly. It requires at least two full seasons of history.
+//   - TrackingSignal returns one value per period (a running signal for
+//     monitoring drift over time), not a single summary value like
+//     Accuracy's metrics.
+//   - MASE's TrainingHistory must not be perfectly constant (a naive
+//     one-step forecast on a constant series has zero error, making MASE's
+//     scaling denominator zero — see ErrZeroNaiveMAE).
 //   - This package does not perform model selection, parameter fitting
 //     (e.g. optimal alpha/beta search), seasonality decomposition, or
 //     ARIMA/ML-based forecasting. It computes the classical formulas given

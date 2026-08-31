@@ -71,6 +71,10 @@ unreleased and could still change before the next tag.
 - `HoltLinearTrend`
 - `Croston`
 - `Accuracy`
+- `HoltWinters`
+- `TrackingSignal`
+- `LinearTrend`
+- `MASE`
 
 ### `abc`
 
@@ -444,6 +448,48 @@ result, err := forecast.Accuracy(forecast.AccuracyInput{
 // result.MAD, result.MAPE, result.Bias, result.RMSE
 ```
 
+### Holt-Winters (Seasonal)
+
+```go
+result, err := forecast.HoltWinters(forecast.HoltWintersInput{
+	History:      []float64{100, 120, 90, 110, 105, 125, 95, 115}, // 2 full seasons
+	Alpha:        0.3, Beta: 0.1, Gamma: 0.2,
+	SeasonLength: 4, // e.g. quarterly seasonality
+	PeriodsAhead: 1,
+})
+```
+
+### Tracking Signal
+
+```go
+ts, err := forecast.TrackingSignal(forecast.TrackingSignalInput{
+	Actual:   []float64{100, 110, 95, 130},
+	Forecast: []float64{90, 115, 100, 120},
+})
+// ts[i] is the running tracking signal through period i; a common rule of
+// thumb flags |ts[i]| outside roughly 4-8 as the forecast drifting out of control.
+```
+
+### Linear Trend
+
+```go
+result, err := forecast.LinearTrend(forecast.LinearTrendInput{
+	History:      []float64{100, 105, 108, 115, 120},
+	PeriodsAhead: 3,
+})
+```
+
+### MASE (Mean Absolute Scaled Error)
+
+```go
+mase, err := forecast.MASE(forecast.MASEInput{
+	TrainingHistory: []float64{100, 110, 105, 120, 115, 130}, // scales the error
+	Actual:          []float64{125, 135},
+	Forecast:        []float64{120, 140},
+})
+// mase < 1 means the forecast beats a naive one-step-ahead benchmark
+```
+
 ## Classification
 
 The `abc` package prioritizes which SKUs deserve tighter inventory control:
@@ -509,6 +555,9 @@ See [SECURITY.md](SECURITY.md) for the project's security scope and how to repor
 - Smoothing constants (Alpha, Beta) must be in `(0, 1]`
 - Croston treats zero as "no demand" and requires at least one non-zero period
 - `Accuracy`'s MAPE excludes periods where the actual value is zero, and is `NaN` if every actual value is zero
+- `HoltWinters` uses additive seasonality only, needs at least two full seasons of history, and documents its exact initialization convention in its doc comment (there's more than one in the literature — verify against your own reference if you need to match a specific one)
+- `TrackingSignal` returns one value per period (for monitoring drift over time), not a single summary value
+- `MASE`'s `TrainingHistory` must not be perfectly constant (see `ErrZeroNaiveMAE`)
 
 **`abc`**
 
@@ -553,7 +602,7 @@ This project follows semantic versioning.
 - `v0.5.0` added policy summary helpers and improved API consistency for inventory planning workflows
 - `v0.6.0` focused on documentation tightening, package consistency, and API stabilization ahead of `v1.0.0`
 - `v1.0.0` is the first stable release of the `inventory` package
-- `Unreleased` adds the `forecast` and `abc` packages, several `inventory` extensions (variable-lead-time and fill-rate safety stock, EPQ, quantity-discount EOQ, newsvendor, inventory ratios), and batch policy-summary helpers; see [CHANGELOG.md](CHANGELOG.md)
+- `Unreleased` adds the `forecast` and `abc` packages, several `inventory` extensions (variable-lead-time and fill-rate safety stock, EPQ, quantity-discount EOQ, newsvendor, inventory ratios), several `forecast` extensions (Holt-Winters, tracking signal, linear trend, MASE), and batch policy-summary helpers; see [CHANGELOG.md](CHANGELOG.md)
 
 ## Documentation
 

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added (forecast extensions)
+- `HoltWinters` — additive-seasonality triple exponential smoothing; one
+  documented initialization convention (see its doc comment), since none is
+  universally standard in the literature
+- `TrackingSignal` — running per-period signal (cumulative error / MAD) for
+  monitoring forecast drift, distinct from `Accuracy`'s single-summary metrics
+- `LinearTrend` — OLS trend-line forecast, for a single trend with no seasonality
+- `MASE` — mean absolute scaled error (Hyndman & Koehler, 2006), well-defined
+  even when `Actual` contains zeros (unlike MAPE)
+
 ### Added (abc package)
 - New `abc` package: `Classify` (ABC/Pareto classification by cumulative
   value contribution), `ClassifyVariability` (XYZ classification by demand
