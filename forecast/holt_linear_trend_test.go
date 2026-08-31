@@ -1,6 +1,9 @@
 package forecast
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 func TestHoltLinearTrend(t *testing.T) {
 	t.Parallel()
@@ -76,6 +79,26 @@ func TestHoltLinearTrend(t *testing.T) {
 				PeriodsAhead: 1,
 			},
 			wantErr: ErrNegativeDemand,
+		},
+		{
+			name: "NaN in history",
+			input: HoltLinearTrendInput{
+				History:      []float64{100, math.NaN()},
+				Alpha:        0.3,
+				Beta:         0.2,
+				PeriodsAhead: 1,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf beta",
+			input: HoltLinearTrendInput{
+				History:      []float64{100, 120},
+				Alpha:        0.3,
+				Beta:         math.Inf(1),
+				PeriodsAhead: 1,
+			},
+			wantErr: ErrNonFiniteInput,
 		},
 	}
 

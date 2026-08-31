@@ -69,6 +69,22 @@ func TestMovingAverage(t *testing.T) {
 			},
 			wantErr: ErrNegativeDemand,
 		},
+		{
+			name: "NaN in history",
+			input: MovingAverageInput{
+				History: []float64{10, math.NaN(), 30},
+				Periods: 3,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf in history",
+			input: MovingAverageInput{
+				History: []float64{10, math.Inf(1), 30},
+				Periods: 3,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
 	}
 
 	for _, tt := range tests {

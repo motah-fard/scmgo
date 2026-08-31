@@ -1,6 +1,9 @@
 package forecast
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 func TestSimpleExponentialSmoothing(t *testing.T) {
 	t.Parallel()
@@ -64,6 +67,22 @@ func TestSimpleExponentialSmoothing(t *testing.T) {
 				Alpha:   0.3,
 			},
 			wantErr: ErrNegativeDemand,
+		},
+		{
+			name: "NaN in history",
+			input: SimpleExponentialSmoothingInput{
+				History: []float64{100, math.NaN()},
+				Alpha:   0.3,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "NaN alpha",
+			input: SimpleExponentialSmoothingInput{
+				History: []float64{100, 120},
+				Alpha:   math.NaN(),
+			},
+			wantErr: ErrNonFiniteInput,
 		},
 	}
 

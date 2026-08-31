@@ -84,6 +84,24 @@ func TestSafetyStockWithServiceLevel(t *testing.T) {
 			},
 			wantErr: ErrInvalidServiceLevel,
 		},
+		{
+			name: "NaN standard deviation (delegated)",
+			input: SafetyStockWithServiceLevelInput{
+				StdDevDailyDemand: math.NaN(),
+				LeadTimeDays:      4,
+				ServiceLevel:      0.95,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf service level (delegated)",
+			input: SafetyStockWithServiceLevelInput{
+				StdDevDailyDemand: 10,
+				LeadTimeDays:      4,
+				ServiceLevel:      math.Inf(1),
+			},
+			wantErr: ErrNonFiniteInput,
+		},
 	}
 
 	const tolerance = 1e-4

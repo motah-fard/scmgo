@@ -13,6 +13,9 @@ import "math"
 //   - 0.975 -> 1.9600
 //   - 0.99  -> 2.3263
 func ZScoreForServiceLevel(serviceLevel float64) (float64, error) {
+	if err := validateFinite(serviceLevel); err != nil {
+		return 0, err
+	}
 	if serviceLevel <= 0 || serviceLevel >= 1 {
 		return 0, ErrInvalidServiceLevel
 	}

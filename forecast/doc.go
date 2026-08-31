@@ -16,6 +16,10 @@
 //   - History series are chronological, oldest value first.
 //   - Demand values must be non-negative.
 //   - Smoothing constants (Alpha, Beta) must be in the interval (0, 1].
+//   - All float64 inputs must be finite: NaN and +/-Inf are rejected with
+//     ErrNonFiniteInput (this includes Actual/Forecast in ForecastAccuracy,
+//     even though its MAPE output can legitimately be NaN when every actual
+//     value is zero -- that is a documented output, not a silent input bug).
 //   - MovingAverage and WeightedMovingAverage require at least as much
 //     history as the requested window.
 //   - HoltLinearTrend requires at least two historical periods to estimate

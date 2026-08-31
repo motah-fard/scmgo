@@ -95,6 +95,33 @@ func TestEOQ(t *testing.T) {
 			want:      894427.1909999159,
 			tolerance: 1e-6,
 		},
+		{
+			name: "NaN annual demand",
+			input: EOQInput{
+				AnnualDemand:       math.NaN(),
+				OrderingCost:       50,
+				HoldingCostPerUnit: 2,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf ordering cost",
+			input: EOQInput{
+				AnnualDemand:       10000,
+				OrderingCost:       math.Inf(1),
+				HoldingCostPerUnit: 2,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf holding cost",
+			input: EOQInput{
+				AnnualDemand:       10000,
+				OrderingCost:       50,
+				HoldingCostPerUnit: math.Inf(1),
+			},
+			wantErr: ErrNonFiniteInput,
+		},
 	}
 
 	for _, tt := range tests {

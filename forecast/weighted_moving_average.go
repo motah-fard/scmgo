@@ -23,6 +23,9 @@ func WeightedMovingAverage(in WeightedMovingAverageInput) (float64, error) {
 	if err := validateNonNegative(in.History); err != nil {
 		return 0, err
 	}
+	if err := validateFiniteSlice(in.Weights); err != nil {
+		return 0, err
+	}
 
 	var weightSum float64
 	for _, w := range in.Weights {

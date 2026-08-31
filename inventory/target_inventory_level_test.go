@@ -1,6 +1,9 @@
 package inventory
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 func TestTargetInventoryLevel(t *testing.T) {
 	tests := []struct {
@@ -56,6 +59,22 @@ func TestTargetInventoryLevel(t *testing.T) {
 				SafetyStockUnits:             -1,
 			},
 			wantErr: ErrNegativeSafetyStock,
+		},
+		{
+			name: "NaN expected demand",
+			input: TargetInventoryLevelInput{
+				ExpectedDemandDuringLeadTime: math.NaN(),
+				SafetyStockUnits:             50,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf safety stock",
+			input: TargetInventoryLevelInput{
+				ExpectedDemandDuringLeadTime: 500,
+				SafetyStockUnits:             math.Inf(1),
+			},
+			wantErr: ErrNonFiniteInput,
 		},
 	}
 

@@ -1,6 +1,9 @@
 package forecast
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 func TestCroston(t *testing.T) {
 	t.Parallel()
@@ -69,6 +72,22 @@ func TestCroston(t *testing.T) {
 				Alpha:   0.2,
 			},
 			wantErr: ErrNegativeDemand,
+		},
+		{
+			name: "NaN in history",
+			input: CrostonInput{
+				History: []float64{0, math.NaN(), 5},
+				Alpha:   0.2,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf alpha",
+			input: CrostonInput{
+				History: []float64{0, 5},
+				Alpha:   math.Inf(1),
+			},
+			wantErr: ErrNonFiniteInput,
 		},
 	}
 

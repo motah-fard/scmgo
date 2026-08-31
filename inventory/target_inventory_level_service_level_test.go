@@ -112,6 +112,16 @@ func TestTargetInventoryLevelWithServiceLevel(t *testing.T) {
 			},
 			wantErr: ErrInvalidServiceLevel,
 		},
+		{
+			name: "NaN average demand (delegated)",
+			input: TargetInventoryLevelWithServiceLevelInput{
+				AvgDailyDemand:    math.NaN(),
+				LeadTimeDays:      4,
+				StdDevDailyDemand: 10,
+				ServiceLevel:      0.95,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
 	}
 
 	const tolerance = 1e-4

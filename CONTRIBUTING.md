@@ -36,10 +36,14 @@ Conventions to follow:
 1. **Inputs are structs, not positional args.** `func EOQ(in EOQInput) (float64, error)`,
    not `func EOQ(demand, orderingCost, holdingCost float64)`. This keeps call
    sites self-documenting and lets us add fields without breaking callers.
-2. **Validate, then compute.** Check every field for domain validity (e.g.
-   non-negative demand, service level strictly between 0 and 1) before doing
-   arithmetic. Return the zero value and a sentinel error on failure — never
-   panic.
+2. **Validate, then compute.** Check every `float64` field with
+   `validateFinite` (see `<package>/validate_internal.go`) *before* any
+   negative/range check — comparisons against `NaN` are always false in
+   IEEE 754, so a plain `v < 0` silently lets `NaN` (and, for one-sided
+   checks, `+Inf`) through, turning a bad upstream value into a silently
+   wrong result instead of an error. Then check domain validity (e.g.
+   non-negative demand, service level strictly between 0 and 1). Return the
+   zero value and a sentinel error on failure — never panic.
 3. **Sentinel errors, reused across functions.** If `ErrNegativeDemand`
    already exists in `errors.go`, reuse it; don't create a near-duplicate.
    Add new sentinels only for genuinely new failure modes. When a function

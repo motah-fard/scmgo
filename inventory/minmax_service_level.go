@@ -11,6 +11,9 @@ package inventory
 // All quantity inputs must be non-negative. Service level must be
 // strictly between 0 and 1, as validated by ReorderPointWithServiceLevel.
 func MinMaxLevelsWithServiceLevel(in MinMaxLevelsWithServiceLevelInput) (MinMaxResult, error) {
+	if err := validateFinite(in.OrderQuantity); err != nil {
+		return MinMaxResult{}, err
+	}
 	if in.OrderQuantity < 0 {
 		return MinMaxResult{}, ErrNegativeOrderQuantity
 	}

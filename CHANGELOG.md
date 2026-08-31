@@ -20,6 +20,13 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - `go.mod` directive order (`module` before `go`) and relaxed the pinned Go
   version from `1.25.1` to `1.23` so the module builds on older toolchains
+- **NaN/Inf silently passing validation in both packages.** Every negative
+  and range check (e.g. `v < 0`, `0 < s < 1`) is a no-op against `NaN` in
+  IEEE 754, so `EOQ`, `ReorderPointWithServiceLevel`, `MovingAverage`, and
+  every other function that took a bad upstream `NaN` or `Inf` returned a
+  poisoned `NaN`/`Inf` result with a `nil` error instead of failing. All
+  `float64` inputs across both packages are now checked with a new
+  `ErrNonFiniteInput` before any other validation.
 
 ## [v1.0.0] - 2026-04-18
 ### Added

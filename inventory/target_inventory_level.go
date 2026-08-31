@@ -8,6 +8,12 @@ package inventory
 // demand over the replenishment protection period used by the caller.
 // All input values must be non-negative.
 func TargetInventoryLevel(in TargetInventoryLevelInput) (float64, error) {
+	if err := validateFinite(in.ExpectedDemandDuringLeadTime); err != nil {
+		return 0, err
+	}
+	if err := validateFinite(in.SafetyStockUnits); err != nil {
+		return 0, err
+	}
 	if in.ExpectedDemandDuringLeadTime < 0 {
 		return 0, ErrNegativeExpectedDemand
 	}

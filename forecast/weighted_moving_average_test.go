@@ -1,6 +1,9 @@
 package forecast
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 func TestWeightedMovingAverage(t *testing.T) {
 	t.Parallel()
@@ -60,6 +63,30 @@ func TestWeightedMovingAverage(t *testing.T) {
 				Weights: []float64{0.5, 0.5},
 			},
 			wantErr: ErrNegativeDemand,
+		},
+		{
+			name: "NaN in history",
+			input: WeightedMovingAverageInput{
+				History: []float64{100, math.NaN(), 110},
+				Weights: []float64{0.5, 0.5},
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "NaN weight",
+			input: WeightedMovingAverageInput{
+				History: []float64{100, 120, 110},
+				Weights: []float64{math.NaN(), 1},
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf weight",
+			input: WeightedMovingAverageInput{
+				History: []float64{100, 120, 110},
+				Weights: []float64{math.Inf(1), 1},
+			},
+			wantErr: ErrNonFiniteInput,
 		},
 	}
 

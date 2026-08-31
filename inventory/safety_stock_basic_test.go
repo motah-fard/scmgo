@@ -1,6 +1,9 @@
 package inventory
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 func TestSafetyStockBasic(t *testing.T) {
 	t.Parallel()
@@ -80,6 +83,26 @@ func TestSafetyStockBasic(t *testing.T) {
 				AvgLeadTimeDays: 5,
 			},
 			want: 0, // (80*4) - (100*5) = -180 => clamp to 0
+		},
+		{
+			name: "NaN max daily demand",
+			input: SafetyStockInput{
+				MaxDailyDemand:  math.NaN(),
+				MaxLeadTimeDays: 7,
+				AvgDailyDemand:  100,
+				AvgLeadTimeDays: 5,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf average lead time",
+			input: SafetyStockInput{
+				MaxDailyDemand:  120,
+				MaxLeadTimeDays: 7,
+				AvgDailyDemand:  100,
+				AvgLeadTimeDays: math.Inf(1),
+			},
+			wantErr: ErrNonFiniteInput,
 		},
 	}
 

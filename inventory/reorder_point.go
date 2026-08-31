@@ -10,6 +10,15 @@ package inventory
 // All demand and lead-time inputs must be non-negative. Service level must be
 // strictly between 0 and 1, as validated by SafetyStockWithServiceLevel.
 func ReorderPointWithServiceLevel(in ReorderPointWithServiceLevelInput) (float64, error) {
+	if err := validateFinite(in.AvgDailyDemand); err != nil {
+		return 0, err
+	}
+	if err := validateFinite(in.LeadTimeDays); err != nil {
+		return 0, err
+	}
+	if err := validateFinite(in.StdDevDailyDemand); err != nil {
+		return 0, err
+	}
 	if in.AvgDailyDemand < 0 {
 		return 0, ErrNegativeDemand
 	}

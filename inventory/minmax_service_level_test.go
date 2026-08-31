@@ -109,6 +109,28 @@ func TestMinMaxLevelsWithServiceLevel(t *testing.T) {
 			},
 			wantErr: ErrInvalidServiceLevel,
 		},
+		{
+			name: "NaN order quantity",
+			input: MinMaxLevelsWithServiceLevelInput{
+				AvgDailyDemand:    50,
+				LeadTimeDays:      4,
+				StdDevDailyDemand: 10,
+				ServiceLevel:      0.95,
+				OrderQuantity:     math.NaN(),
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf average demand (delegated to ReorderPointWithServiceLevel)",
+			input: MinMaxLevelsWithServiceLevelInput{
+				AvgDailyDemand:    math.Inf(1),
+				LeadTimeDays:      4,
+				StdDevDailyDemand: 10,
+				ServiceLevel:      0.95,
+				OrderQuantity:     100,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
 	}
 
 	const tolerance = 1e-4

@@ -112,6 +112,26 @@ func TestReorderPointWithServiceLevel(t *testing.T) {
 			},
 			wantErr: ErrInvalidServiceLevel,
 		},
+		{
+			name: "NaN average demand",
+			input: ReorderPointWithServiceLevelInput{
+				AvgDailyDemand:    math.NaN(),
+				LeadTimeDays:      4,
+				StdDevDailyDemand: 10,
+				ServiceLevel:      0.95,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf service level",
+			input: ReorderPointWithServiceLevelInput{
+				AvgDailyDemand:    50,
+				LeadTimeDays:      4,
+				StdDevDailyDemand: 10,
+				ServiceLevel:      math.Inf(1),
+			},
+			wantErr: ErrNonFiniteInput,
+		},
 	}
 
 	const tolerance = 1e-4

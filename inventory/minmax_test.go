@@ -1,6 +1,7 @@
 package inventory
 
 import (
+	"math"
 	"testing"
 )
 
@@ -72,6 +73,22 @@ func TestMinMaxLevels(t *testing.T) {
 				Min: 10_000_000,
 				Max: 15_000_000,
 			},
+		},
+		{
+			name: "NaN reorder point",
+			input: MinMaxInput{
+				ReorderPoint:  math.NaN(),
+				OrderQuantity: 200,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf order quantity",
+			input: MinMaxInput{
+				ReorderPoint:  300,
+				OrderQuantity: math.Inf(1),
+			},
+			wantErr: ErrNonFiniteInput,
 		},
 	}
 

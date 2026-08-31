@@ -1,6 +1,9 @@
 package inventory
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 func TestDemandDuringLeadTime(t *testing.T) {
 	tests := []struct {
@@ -56,6 +59,22 @@ func TestDemandDuringLeadTime(t *testing.T) {
 				LeadTimeDays:   -2,
 			},
 			wantErr: ErrNegativeLeadTime,
+		},
+		{
+			name: "NaN demand",
+			input: DemandDuringLeadTimeInput{
+				AvgDailyDemand: math.NaN(),
+				LeadTimeDays:   5,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf lead time",
+			input: DemandDuringLeadTimeInput{
+				AvgDailyDemand: 100,
+				LeadTimeDays:   math.Inf(1),
+			},
+			wantErr: ErrNonFiniteInput,
 		},
 	}
 

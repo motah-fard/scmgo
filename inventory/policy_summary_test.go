@@ -293,3 +293,34 @@ func TestBuildPolicySummaryWithServiceLevelInvalidServiceLevel(t *testing.T) {
 		t.Fatalf("expected ErrInvalidServiceLevel, got %v", err)
 	}
 }
+
+func TestBuildPolicySummaryNonFiniteInput(t *testing.T) {
+	_, err := BuildPolicySummary(PolicySummaryInput{
+		DailyDemand:      math.NaN(),
+		LeadTimeDays:     5,
+		ReviewPeriodDays: 7,
+		SafetyStockUnits: 50,
+	})
+	if !errors.Is(err, ErrInvalidPolicySummaryInput) {
+		t.Fatalf("expected ErrInvalidPolicySummaryInput, got %v", err)
+	}
+	if !errors.Is(err, ErrNonFiniteInput) {
+		t.Fatalf("expected ErrNonFiniteInput, got %v", err)
+	}
+}
+
+func TestBuildPolicySummaryWithServiceLevelNonFiniteInput(t *testing.T) {
+	_, err := BuildPolicySummaryWithServiceLevel(PolicySummaryServiceLevelInput{
+		DailyDemand:        100,
+		LeadTimeDays:       5,
+		ReviewPeriodDays:   7,
+		DemandStdDevPerDay: 20,
+		ServiceLevel:       math.Inf(1),
+	})
+	if !errors.Is(err, ErrInvalidPolicySummaryInput) {
+		t.Fatalf("expected ErrInvalidPolicySummaryInput, got %v", err)
+	}
+	if !errors.Is(err, ErrNonFiniteInput) {
+		t.Fatalf("expected ErrNonFiniteInput, got %v", err)
+	}
+}

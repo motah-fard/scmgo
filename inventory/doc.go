@@ -28,6 +28,8 @@
 //   - Input units must be consistent.
 //     For example, if demand is measured per day, lead time should also be in days.
 //   - Safety stock is expressed in inventory units.
+//   - All float64 inputs must be finite: NaN and +/-Inf are rejected with
+//     ErrNonFiniteInput rather than silently propagating into the result.
 //   - EOQ uses the classic Wilson EOQ formula.
 //   - SafetyStockBasic uses a simple max/average demand and lead-time formula.
 //   - SafetyStockWithServiceLevel assumes a normal approximation and combines

@@ -13,6 +13,12 @@ func ForecastAccuracy(in ForecastAccuracyInput) (ForecastAccuracyResult, error) 
 	if len(in.Actual) != len(in.Forecast) {
 		return ForecastAccuracyResult{}, ErrMismatchedLengths
 	}
+	if err := validateFiniteSlice(in.Actual); err != nil {
+		return ForecastAccuracyResult{}, err
+	}
+	if err := validateFiniteSlice(in.Forecast); err != nil {
+		return ForecastAccuracyResult{}, err
+	}
 
 	var (
 		absSum     float64

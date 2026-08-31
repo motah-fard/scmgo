@@ -9,6 +9,15 @@ import "math"
 // Annual demand and ordering cost must be non-negative values.
 // Holding cost per unit must be greater than zero.
 func EOQ(in EOQInput) (float64, error) {
+	if err := validateFinite(in.AnnualDemand); err != nil {
+		return 0, err
+	}
+	if err := validateFinite(in.OrderingCost); err != nil {
+		return 0, err
+	}
+	if err := validateFinite(in.HoldingCostPerUnit); err != nil {
+		return 0, err
+	}
 	if in.AnnualDemand < 0 {
 		return 0, ErrNegativeDemand
 	}

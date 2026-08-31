@@ -12,4 +12,5 @@ var (
 	ErrInvalidSmoothingConstant = errors.New("smoothing constant must be greater than 0 and less than or equal to 1")
 	ErrNoNonZeroDemand          = errors.New("history must contain at least one non-zero demand period")
 	ErrMismatchedLengths        = errors.New("actual and forecast series must have the same length")
+	ErrNonFiniteInput           = errors.New("input values must be finite (not NaN or Inf)")
 )

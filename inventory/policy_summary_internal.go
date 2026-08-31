@@ -4,6 +4,11 @@ import "errors"
 
 // validatePolicySummaryInput validates deterministic policy summary inputs.
 func validatePolicySummaryInput(input PolicySummaryInput) error {
+	for _, v := range []float64{input.DailyDemand, input.LeadTimeDays, input.ReviewPeriodDays, input.SafetyStockUnits} {
+		if err := validateFinite(v); err != nil {
+			return errors.Join(ErrInvalidPolicySummaryInput, err)
+		}
+	}
 	if input.DailyDemand < 0 {
 		return errors.Join(ErrInvalidPolicySummaryInput, ErrNegativeDemand)
 	}
@@ -22,6 +27,11 @@ func validatePolicySummaryInput(input PolicySummaryInput) error {
 // validatePolicySummaryServiceLevelInput validates service-level-based
 // policy summary inputs.
 func validatePolicySummaryServiceLevelInput(input PolicySummaryServiceLevelInput) error {
+	for _, v := range []float64{input.DailyDemand, input.LeadTimeDays, input.ReviewPeriodDays, input.DemandStdDevPerDay, input.ServiceLevel} {
+		if err := validateFinite(v); err != nil {
+			return errors.Join(ErrInvalidPolicySummaryInput, err)
+		}
+	}
 	if input.DailyDemand < 0 {
 		return errors.Join(ErrInvalidPolicySummaryInput, ErrNegativeDemand)
 	}

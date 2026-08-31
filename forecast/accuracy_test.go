@@ -74,6 +74,22 @@ func TestForecastAccuracy(t *testing.T) {
 			},
 			wantErr: ErrMismatchedLengths,
 		},
+		{
+			name: "NaN in actual",
+			input: ForecastAccuracyInput{
+				Actual:   []float64{100, math.NaN()},
+				Forecast: []float64{90, 100},
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf in forecast",
+			input: ForecastAccuracyInput{
+				Actual:   []float64{100, 110},
+				Forecast: []float64{90, math.Inf(1)},
+			},
+			wantErr: ErrNonFiniteInput,
+		},
 	}
 
 	for _, tt := range tests {

@@ -60,6 +60,22 @@ func TestStdDevDemandDuringLeadTime(t *testing.T) {
 			},
 			wantErr: ErrNegativeLeadTime,
 		},
+		{
+			name: "NaN standard deviation",
+			input: StdDevDemandDuringLeadTimeInput{
+				StdDevDailyDemand: math.NaN(),
+				LeadTimeDays:      4,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf lead time",
+			input: StdDevDemandDuringLeadTimeInput{
+				StdDevDailyDemand: 10,
+				LeadTimeDays:      math.Inf(1),
+			},
+			wantErr: ErrNonFiniteInput,
+		},
 	}
 
 	const tolerance = 1e-9

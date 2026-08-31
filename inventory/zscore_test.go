@@ -84,3 +84,23 @@ func TestZScoreForServiceLevel(t *testing.T) {
 		})
 	}
 }
+
+func TestZScoreForServiceLevelNonFinite(t *testing.T) {
+	tests := []struct {
+		name         string
+		serviceLevel float64
+	}{
+		{name: "NaN", serviceLevel: math.NaN()},
+		{name: "+Inf", serviceLevel: math.Inf(1)},
+		{name: "-Inf", serviceLevel: math.Inf(-1)},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := ZScoreForServiceLevel(tt.serviceLevel)
+			if err != ErrNonFiniteInput {
+				t.Fatalf("expected ErrNonFiniteInput, got %v", err)
+			}
+		})
+	}
+}

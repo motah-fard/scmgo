@@ -7,6 +7,12 @@ package inventory
 //
 // Both input values must be non-negative.
 func MinMaxLevels(in MinMaxInput) (MinMaxResult, error) {
+	if err := validateFinite(in.ReorderPoint); err != nil {
+		return MinMaxResult{}, err
+	}
+	if err := validateFinite(in.OrderQuantity); err != nil {
+		return MinMaxResult{}, err
+	}
 	if in.ReorderPoint < 0 {
 		return MinMaxResult{}, ErrNegativeReorderPoint
 	}

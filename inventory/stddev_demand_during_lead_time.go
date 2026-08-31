@@ -10,6 +10,12 @@ import "math"
 // This assumes independent daily demand variability across lead-time periods.
 // All input values must be non-negative.
 func StdDevDemandDuringLeadTime(in StdDevDemandDuringLeadTimeInput) (float64, error) {
+	if err := validateFinite(in.StdDevDailyDemand); err != nil {
+		return 0, err
+	}
+	if err := validateFinite(in.LeadTimeDays); err != nil {
+		return 0, err
+	}
 	if in.StdDevDailyDemand < 0 {
 		return 0, ErrNegativeStandardDeviation
 	}

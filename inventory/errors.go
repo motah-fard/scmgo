@@ -16,4 +16,5 @@ var (
 	ErrNegativeExpectedDemand    = errors.New("expected demand cannot be negative")
 	ErrInvalidPolicySummaryInput = errors.New("invalid policy summary input")
 	ErrNegativeReviewPeriod      = errors.New("review period cannot be negative")
+	ErrNonFiniteInput            = errors.New("input values must be finite (not NaN or Inf)")
 )

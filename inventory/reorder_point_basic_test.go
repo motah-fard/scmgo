@@ -1,6 +1,9 @@
 package inventory
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 func TestReorderPoint(t *testing.T) {
 	t.Parallel()
@@ -82,6 +85,24 @@ func TestReorderPoint(t *testing.T) {
 				SafetyStockUnits: 10_000_000,
 			},
 			want: 375_000_000,
+		},
+		{
+			name: "NaN average demand",
+			input: ReorderPointInput{
+				AvgDailyDemand:   math.NaN(),
+				LeadTimeDays:     5,
+				SafetyStockUnits: 50,
+			},
+			wantErr: ErrNonFiniteInput,
+		},
+		{
+			name: "Inf safety stock",
+			input: ReorderPointInput{
+				AvgDailyDemand:   100,
+				LeadTimeDays:     5,
+				SafetyStockUnits: math.Inf(1),
+			},
+			wantErr: ErrNonFiniteInput,
 		},
 	}
 
