@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added (warehouse package)
+- New `warehouse` package: `StorageUtilization`, `CubeUtilization` (neither
+  clamped — a value above 1 signals overcommitted storage), and `PickRate`.
+  Deliberately no separate velocity-based slotting function: that's exactly
+  what `abc.Classify` already does (classify by pick velocity instead of
+  usage value). Full tests, examples, fuzz targets; 100% coverage.
+
 ### Added (logistics package)
 - New `logistics` package: `DimensionalWeight`/`BillableWeight` (the
   divisor is caller-supplied, not a hardcoded carrier constant, since it

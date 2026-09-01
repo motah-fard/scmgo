@@ -14,6 +14,7 @@
 - **`procurement`** — landed cost, purchase price variance, and total cost of ownership.
 - **`production`** — OEE, Little's Law (all three directions), and takt time.
 - **`logistics`** — dimensional/billable weight, freight cost allocation, vehicle utilization, and center-of-gravity facility location.
+- **`warehouse`** — storage utilization, cube utilization, and pick rate.
 
 See [Roadmap](#roadmap) for planned packages.
 
@@ -107,6 +108,12 @@ unreleased and could still change before the next tag.
 - `VehicleUtilization`
 - `CenterOfGravity`
 
+### `warehouse`
+
+- `StorageUtilization`
+- `CubeUtilization`
+- `PickRate`
+
 ## Why scmgo
 
 Many inventory and supply-chain calculations still live in spreadsheets, internal notes, or one-off scripts. `scmgo` provides a lightweight Go-native alternative for developers building:
@@ -128,6 +135,7 @@ go get github.com/motah-fard/scmgo/abc@latest
 go get github.com/motah-fard/scmgo/procurement@latest
 go get github.com/motah-fard/scmgo/production@latest
 go get github.com/motah-fard/scmgo/logistics@latest
+go get github.com/motah-fard/scmgo/warehouse@latest
 ```
 
 ## Packages
@@ -138,6 +146,7 @@ go get github.com/motah-fard/scmgo/logistics@latest
 - `github.com/motah-fard/scmgo/procurement`
 - `github.com/motah-fard/scmgo/production`
 - `github.com/motah-fard/scmgo/logistics`
+- `github.com/motah-fard/scmgo/warehouse`
 
 ## Quick Start
 
