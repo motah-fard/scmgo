@@ -63,9 +63,11 @@ jobs:
         with:
           version: latest
 
-  fuzz:
-    name: fuzz (short)
+  fuzz-discover:
+    name: discover fuzz packages
     runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.discover.outputs.packages }}
     steps:
       - uses: actions/checkout@v4
 
@@ -74,13 +76,42 @@ jobs:
           go-version: "1.24"
           check-latest: true
 
-      - name: Fuzz each target briefly
+      # Packages are discovered via `go list ./...`, not a hardcoded list,
+      # so a new package can't silently skip fuzzing because someone forgot
+      # to add it here.
+      - id: discover
         run: |
           set -e
-          for pkg in $(go list ./...); do
-            for name in $(go test "$pkg" -list '^Fuzz' | grep '^Fuzz'); do
-              echo "::group::$pkg $name"
-              go test "$pkg" -run=NONE -fuzz="^${name}\$" -fuzztime=15s
-              echo "::endgroup::"
-            done
+          packages=$(
+            for pkg in $(go list ./...); do
+              if [ -n "$(go test "$pkg" -list '^Fuzz' | grep '^Fuzz' || true)" ]; then
+                echo "$pkg"
+              fi
+            done | jq -R -s -c 'split("\n")[:-1]'
+          )
+          echo "packages=$packages" >> "$GITHUB_OUTPUT"
+
+  fuzz:
+    name: fuzz (${{ matrix.package }})
+    needs: fuzz-discover
+    if: needs.fuzz-discover.outputs.packages != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.fuzz-discover.outputs.packages) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          check-latest: true
+
+      - name: Fuzz each target in this package briefly
+        run: |
+          set -e
+          for name in $(go test "${{ matrix.package }}" -list '^Fuzz' | grep '^Fuzz'); do
+            echo "::group::${{ matrix.package }} $name"
+            go test "${{ matrix.package }}" -run=NONE -fuzz="^${name}\$" -fuzztime=15s
+            echo "::endgroup::"
           done
