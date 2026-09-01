@@ -13,6 +13,7 @@
 - **`abc`** — ABC (Pareto) classification by value concentration, XYZ classification by demand variability, and combining the two into the classic ABC-XYZ matrix.
 - **`procurement`** — landed cost, purchase price variance, and total cost of ownership.
 - **`production`** — OEE, Little's Law (all three directions), and takt time.
+- **`logistics`** — dimensional/billable weight, freight cost allocation, vehicle utilization, and center-of-gravity facility location.
 
 See [Roadmap](#roadmap) for planned packages.
 
@@ -98,6 +99,14 @@ unreleased and could still change before the next tag.
 - `ThroughputFromLittlesLaw`
 - `TaktTime`
 
+### `logistics`
+
+- `DimensionalWeight`
+- `BillableWeight`
+- `AllocateFreightCost`
+- `VehicleUtilization`
+- `CenterOfGravity`
+
 ## Why scmgo
 
 Many inventory and supply-chain calculations still live in spreadsheets, internal notes, or one-off scripts. `scmgo` provides a lightweight Go-native alternative for developers building:
@@ -118,6 +127,7 @@ go get github.com/motah-fard/scmgo/forecast@latest
 go get github.com/motah-fard/scmgo/abc@latest
 go get github.com/motah-fard/scmgo/procurement@latest
 go get github.com/motah-fard/scmgo/production@latest
+go get github.com/motah-fard/scmgo/logistics@latest
 ```
 
 ## Packages
@@ -127,6 +137,7 @@ go get github.com/motah-fard/scmgo/production@latest
 - `github.com/motah-fard/scmgo/abc`
 - `github.com/motah-fard/scmgo/procurement`
 - `github.com/motah-fard/scmgo/production`
+- `github.com/motah-fard/scmgo/logistics`
 
 ## Quick Start
 

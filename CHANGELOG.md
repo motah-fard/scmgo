@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added (logistics package)
+- New `logistics` package: `DimensionalWeight`/`BillableWeight` (the
+  divisor is caller-supplied, not a hardcoded carrier constant, since it
+  varies by carrier and changes over time), `AllocateFreightCost`
+  (proportional allocation by a caller-supplied basis), `VehicleUtilization`
+  (not clamped — a value above 1 signals an overload, which is meaningful),
+  and `CenterOfGravity` (demand-weighted centroid for facility location;
+  straight-line/Euclidean, not road-network distance). Full tests,
+  examples, fuzz targets; 98.2% coverage.
+
 ### Added (production package)
 - New `production` package: `OEE` (computed from raw availability/
   performance/quality inputs, not precomputed ratios; result is not
