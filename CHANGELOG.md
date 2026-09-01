@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added (production package)
+- New `production` package: `OEE` (computed from raw availability/
+  performance/quality inputs, not precomputed ratios; result is not
+  clamped to `[0, 1]`), `WIPFromLittlesLaw`/`CycleTimeFromLittlesLaw`/
+  `ThroughputFromLittlesLaw` (Little's Law, one explicitly named function
+  per direction rather than an implicit "solve for X" parameter), and
+  `TaktTime`. Deliberately does not include BOM explosion or lot-sizing
+  algorithms (Wagner-Whitin, Silver-Meal, Part-Period Balancing) — those
+  are graph-traversal/dynamic-programming problems, not closed-form
+  formulas, and need more design and testing rigor than this pass gave the
+  rest of the library's formulas. Full tests, examples, fuzz targets;
+  95.7% coverage.
+
 ### Added (procurement package)
 - New `procurement` package: `LandedCost` and `TotalCostOfOwnership` (sum
   labeled, possibly-negative cost components — deliberately not hardcoding

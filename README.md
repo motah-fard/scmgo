@@ -12,6 +12,7 @@
 - **`forecast`** — demand forecasting to feed the `inventory` package's inputs: moving average, weighted moving average, simple exponential smoothing, Holt's linear trend, Croston's method for intermittent demand, and forecast accuracy metrics (MAD, MAPE, Bias, RMSE).
 - **`abc`** — ABC (Pareto) classification by value concentration, XYZ classification by demand variability, and combining the two into the classic ABC-XYZ matrix.
 - **`procurement`** — landed cost, purchase price variance, and total cost of ownership.
+- **`production`** — OEE, Little's Law (all three directions), and takt time.
 
 See [Roadmap](#roadmap) for planned packages.
 
@@ -89,6 +90,14 @@ unreleased and could still change before the next tag.
 - `PurchasePriceVariance`
 - `TotalCostOfOwnership`
 
+### `production`
+
+- `OEE`
+- `WIPFromLittlesLaw`
+- `CycleTimeFromLittlesLaw`
+- `ThroughputFromLittlesLaw`
+- `TaktTime`
+
 ## Why scmgo
 
 Many inventory and supply-chain calculations still live in spreadsheets, internal notes, or one-off scripts. `scmgo` provides a lightweight Go-native alternative for developers building:
@@ -108,6 +117,7 @@ go get github.com/motah-fard/scmgo/inventory@latest
 go get github.com/motah-fard/scmgo/forecast@latest
 go get github.com/motah-fard/scmgo/abc@latest
 go get github.com/motah-fard/scmgo/procurement@latest
+go get github.com/motah-fard/scmgo/production@latest
 ```
 
 ## Packages
@@ -116,6 +126,7 @@ go get github.com/motah-fard/scmgo/procurement@latest
 - `github.com/motah-fard/scmgo/forecast`
 - `github.com/motah-fard/scmgo/abc`
 - `github.com/motah-fard/scmgo/procurement`
+- `github.com/motah-fard/scmgo/production`
 
 ## Quick Start
 
