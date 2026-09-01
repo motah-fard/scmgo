@@ -27,13 +27,15 @@ The goal is to keep the API:
 
 ## Stability
 
-The `inventory` package's public API is stable as of `v1.0.0` (the latest
-tagged release is `v1.0.1`, a patch that only touched `go.mod`). Every
-other package listed above, and every `inventory` addition under
-[Beyond Cycle Service Level](#beyond-cycle-service-level), is new — tested
-to the same standard (see [Current Scope](#current-scope)) but not yet
-shipped in a tagged release, so treat their APIs as provisional until the
-next version tag.
+The `inventory` package's public API has been stable across three releases
+(`v1.0.0`, `v1.0.1`, `v1.1.0`). Every other package listed above, along
+with the `inventory` additions under
+[Beyond Cycle Service Level](#beyond-cycle-service-level), shipped for the
+first time in `v1.1.0` — tested to the same standard (see
+[Current Scope](#current-scope)), but new enough that they haven't yet had
+real-world usage outside this repo to surface API rough edges the way
+`inventory` has over its three releases. No changes are planned, but treat
+their APIs as newer/less battle-tested than `inventory`'s.
 
 ## Current Scope
 
@@ -796,7 +798,7 @@ This project follows semantic versioning.
 - `v0.6.0` focused on documentation tightening, package consistency, and API stabilization ahead of `v1.0.0`
 - `v1.0.0` is the first stable release of the `inventory` package
 - `v1.0.1` fixed a `go.mod` directive-order issue; no API change
-- `Unreleased` adds seven new packages (`abc`, `procurement`, `production`, `logistics`, `warehouse`, `quality`, `finance`), several `inventory` extensions (variable-lead-time and fill-rate safety stock, EPQ, quantity-discount EOQ, newsvendor, inventory ratios, EOI, safety time), several `forecast` extensions (Holt-Winters, tracking signal, linear trend, MASE, demand pattern classification, SBA, naive/seasonal naive), `quality.SigmaLevel`, and batch policy-summary helpers; see [CHANGELOG.md](CHANGELOG.md)
+- `v1.1.0` adds seven new packages (`abc`, `procurement`, `production`, `logistics`, `warehouse`, `quality`, `finance`), several `inventory` extensions (variable-lead-time and fill-rate safety stock, EPQ, quantity-discount EOQ, newsvendor, inventory ratios, EOI, safety time), several `forecast` extensions (Holt-Winters, tracking signal, linear trend, MASE, demand pattern classification, SBA, naive/seasonal naive), `quality.SigmaLevel`, and batch policy-summary helpers — all additive, no breaking changes; see [CHANGELOG.md](CHANGELOG.md)
 
 ## Documentation
 

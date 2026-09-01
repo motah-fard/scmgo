@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [v1.1.0] - 2026-08-31
 ### Fixed (CI)
 - **Every CI run has failed on the `lint` job since the workflow was
   added.** `golangci-lint-action@v6` does not support golangci-lint v2 (per
