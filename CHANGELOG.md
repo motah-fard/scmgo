@@ -196,8 +196,6 @@ targets.
   a tagged release yet.
 
 ### Fixed
-- `go.mod` directive order (`module` before `go`) and relaxed the pinned Go
-  version from `1.25.1` to `1.23` so the module builds on older toolchains
 - **NaN/Inf silently passing validation in both packages.** Every negative
   and range check (e.g. `v < 0`, `0 < s < 1`) is a no-op against `NaN` in
   IEEE 754, so `EOQ`, `ReorderPointWithServiceLevel`, `MovingAverage`, and
@@ -209,6 +207,11 @@ targets.
   `version: latest` now installs golangci-lint v2, which refuses a v1
   config outright. The lint CI job would have failed on the first push.
   Migrated to v2 config format.
+
+## [v1.0.1] - 2026-04-24
+### Fixed
+- `go.mod` directive order (`module` before `go`) and relaxed the pinned Go
+  version from `1.25.1` to `1.23` so the module builds on older toolchains
 
 ## [v1.0.0] - 2026-04-18
 ### Added

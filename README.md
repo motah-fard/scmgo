@@ -27,8 +27,9 @@ The goal is to keep the API:
 
 ## Stability
 
-The `inventory` package's public API is stable as of `v1.0.0`. Every other
-package listed above, and every `inventory` addition under
+The `inventory` package's public API is stable as of `v1.0.0` (the latest
+tagged release is `v1.0.1`, a patch that only touched `go.mod`). Every
+other package listed above, and every `inventory` addition under
 [Beyond Cycle Service Level](#beyond-cycle-service-level), is new — tested
 to the same standard (see [Current Scope](#current-scope)) but not yet
 shipped in a tagged release, so treat their APIs as provisional until the
@@ -794,6 +795,7 @@ This project follows semantic versioning.
 - `v0.5.0` added policy summary helpers and improved API consistency for inventory planning workflows
 - `v0.6.0` focused on documentation tightening, package consistency, and API stabilization ahead of `v1.0.0`
 - `v1.0.0` is the first stable release of the `inventory` package
+- `v1.0.1` fixed a `go.mod` directive-order issue; no API change
 - `Unreleased` adds seven new packages (`abc`, `procurement`, `production`, `logistics`, `warehouse`, `quality`, `finance`), several `inventory` extensions (variable-lead-time and fill-rate safety stock, EPQ, quantity-discount EOQ, newsvendor, inventory ratios, EOI, safety time), several `forecast` extensions (Holt-Winters, tracking signal, linear trend, MASE, demand pattern classification, SBA, naive/seasonal naive), `quality.SigmaLevel`, and batch policy-summary helpers; see [CHANGELOG.md](CHANGELOG.md)
 
 ## Documentation
