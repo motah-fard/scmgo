@@ -246,3 +246,20 @@ type GMROIInput struct {
 	GrossMargin          float64
 	AverageInventoryCost float64
 }
+
+// EOIInput contains the inputs required to calculate the economic order
+// interval.
+type EOIInput struct {
+	AnnualDemand       float64
+	OrderingCost       float64
+	HoldingCostPerUnit float64
+	// DaysPerYear is the number of days in the period AnnualDemand covers
+	// (e.g. 365).
+	DaysPerYear float64
+}
+
+// SafetyTimeInput contains the inputs required to calculate safety time.
+type SafetyTimeInput struct {
+	SafetyStockUnits float64
+	AvgDailyDemand   float64
+}

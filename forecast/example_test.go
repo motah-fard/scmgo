@@ -148,3 +148,56 @@ func ExampleMASE() {
 	fmt.Printf("%.2f\n", mase)
 	// Output: 0.50
 }
+
+func ExampleClassifyDemandPattern() {
+	result, err := ClassifyDemandPattern(DemandClassificationInput{
+		History: []float64{0, 0, 5, 0, 0, 0, 3, 0, 4, 0},
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("class=%s ADI=%.2f CV2=%.4f\n", result.Class, result.ADI, result.CV2)
+	// Output: class=intermittent ADI=3.33 CV2=0.0417
+}
+
+func ExampleSBA() {
+	result, err := SBA(CrostonInput{
+		History: []float64{0, 0, 5, 0, 0, 0, 3, 0, 4, 0},
+		Alpha:   0.2,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.2f\n", result.Forecast)
+	// Output: 1.36
+}
+
+func ExampleNaive() {
+	forecast, err := Naive(NaiveInput{History: []float64{100, 120, 90, 110, 105, 125, 95, 115}})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.0f\n", forecast)
+	// Output: 115
+}
+
+func ExampleSeasonalNaive() {
+	forecast, err := SeasonalNaive(SeasonalNaiveInput{
+		History:      []float64{100, 120, 90, 110, 105, 125, 95, 115},
+		SeasonLength: 4,
+		PeriodsAhead: 1,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.0f\n", forecast)
+	// Output: 105
+}

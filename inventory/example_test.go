@@ -410,3 +410,30 @@ func ExampleGMROI() {
 	fmt.Printf("%.2f\n", gmroi)
 	// Output: 2.50
 }
+
+func ExampleEOI() {
+	eoi, err := EOI(EOIInput{
+		AnnualDemand:       10000,
+		OrderingCost:       50,
+		HoldingCostPerUnit: 2,
+		DaysPerYear:        365,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.2f\n", eoi)
+	// Output: 25.81
+}
+
+func ExampleSafetyTime() {
+	safetyTime, err := SafetyTime(SafetyTimeInput{SafetyStockUnits: 50, AvgDailyDemand: 20})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.1f\n", safetyTime)
+	// Output: 2.5
+}

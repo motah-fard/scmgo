@@ -33,4 +33,6 @@ var (
 	ErrInvalidDaysInPeriod           = errors.New("days in period must be greater than zero")
 	ErrInvalidAverageInventoryCost   = errors.New("average inventory cost must be greater than zero")
 	ErrFillRateNotAchievable         = errors.New("target fill rate is not achievable within supported precision for the given order quantity and demand variability")
+	ErrInvalidAnnualDemand           = errors.New("annual demand must be greater than zero")
+	ErrInvalidAvgDailyDemand         = errors.New("average daily demand must be greater than zero")
 )

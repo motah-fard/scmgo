@@ -50,3 +50,14 @@ func ExampleCostOfQuality() {
 	fmt.Printf("Total=%.0f Conformance=%.0f NonConformance=%.0f\n", result.Total, result.ConformanceCost, result.NonConformanceCost)
 	// Output: Total=45000 Conformance=13000 NonConformance=32000
 }
+
+func ExampleSigmaLevel() {
+	sigma, err := SigmaLevel(3.4)
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Printf("%.2f\n", sigma)
+	// Output: 6.00
+}

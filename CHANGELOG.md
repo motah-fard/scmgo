@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added (six follow-up functions)
+- `quality.SigmaLevel` — converts DPMO to a Six-Sigma process sigma level
+  (the conventional 1.5-sigma shift). Extracted the shared inverse-normal-
+  CDF math into `internal/numeric.InverseNormalCDF` so it isn't duplicated
+  with `inventory.ZScoreForServiceLevel`, which now calls the same helper
+  (no behavior change, verified against its existing tests).
+- `forecast.ClassifyDemandPattern` — Syntetos & Boylan (2005) demand
+  classification (smooth/intermittent/erratic/lumpy), telling you which
+  forecasting method fits a series.
+- `forecast.SBA` — Syntetos-Boylan Approximation, a bias correction to
+  `Croston` (`Forecast × (1 - Alpha/2)`); takes the same `CrostonInput`.
+- `forecast.Naive` and `forecast.SeasonalNaive` — baseline forecasts, the
+  natural thing to benchmark `MASE` against.
+- `inventory.EOI` — economic order interval, `EOQ` expressed as a time
+  interval instead of a quantity.
+- `inventory.SafetyTime` — safety stock expressed as a time buffer instead
+  of a quantity.
+
+All six verified against independently computed Python reference values
+(including cross-checks against known reference points — DPMO=3.4 gives
+~6.0 sigma, the classic "Six Sigma" target) before being encoded as Go
+tests. Full tests, examples, and fuzz targets.
+
 ### Added (finance package)
 - New `finance` package: `DSO`, `DPO`, `CashToCashCycleTime` (takes DIO/
   DSO/DPO as direct inputs rather than recomputing them, so DIO can come

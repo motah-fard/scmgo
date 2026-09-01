@@ -49,3 +49,13 @@ func FuzzCostOfQuality(f *testing.F) {
 		}
 	})
 }
+
+func FuzzSigmaLevel(f *testing.F) {
+	f.Add(3.4)
+	f.Fuzz(func(t *testing.T, dpmo float64) {
+		result, err := SigmaLevel(dpmo)
+		if err == nil && math.IsNaN(result) {
+			t.Fatalf("SigmaLevel returned NaN with nil error for dpmo=%v", dpmo)
+		}
+	})
+}

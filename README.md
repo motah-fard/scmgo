@@ -65,6 +65,8 @@ next version tag.
 - `Turnover`
 - `DaysOfInventoryOnHand`
 - `GMROI`
+- `EOI`
+- `SafetyTime`
 
 ### `forecast`
 
@@ -78,6 +80,10 @@ next version tag.
 - `TrackingSignal`
 - `LinearTrend`
 - `MASE`
+- `ClassifyDemandPattern`
+- `SBA`
+- `Naive`
+- `SeasonalNaive`
 
 ### `abc`
 
@@ -119,6 +125,7 @@ next version tag.
 - `Cp`
 - `Cpk`
 - `CostOfQuality`
+- `SigmaLevel`
 
 ### `finance`
 
@@ -431,6 +438,14 @@ nv, err := inventory.Newsvendor(inventory.NewsvendorInput{
 	MeanDemand: 500, StdDevDemand: 100,
 	UnderageCostPerUnit: 18, OverageCostPerUnit: 7,
 })
+
+// EOQ expressed as a time interval instead of a quantity.
+eoi, err := inventory.EOI(inventory.EOIInput{
+	AnnualDemand: 10000, OrderingCost: 50, HoldingCostPerUnit: 2, DaysPerYear: 365,
+})
+
+// Safety stock expressed as a time buffer instead of a quantity.
+st, err := inventory.SafetyTime(inventory.SafetyTimeInput{SafetyStockUnits: 50, AvgDailyDemand: 20})
 ```
 
 ## Forecasting
@@ -547,6 +562,42 @@ mase, err := forecast.MASE(forecast.MASEInput{
 // mase < 1 means the forecast beats a naive one-step-ahead benchmark
 ```
 
+### Demand Pattern Classification
+
+Tells you which forecasting method fits a series — Croston/SBA for
+intermittent or lumpy demand, simpler methods otherwise.
+
+```go
+result, err := forecast.ClassifyDemandPattern(forecast.DemandClassificationInput{
+	History: []float64{0, 0, 5, 0, 0, 0, 3, 0, 4, 0},
+})
+// result.Class is "smooth", "intermittent", "erratic", or "lumpy"
+```
+
+### SBA (Croston Bias Correction)
+
+```go
+result, err := forecast.SBA(forecast.CrostonInput{
+	History: []float64{0, 0, 5, 0, 0, 0, 3, 0, 4, 0},
+	Alpha:   0.2,
+})
+// same CrostonInput as forecast.Croston; SBA's Forecast is always <= Croston's
+```
+
+### Naive and Seasonal Naive
+
+Baselines to benchmark other methods against — `MASE`'s scaling
+denominator uses the same one-step-naive logic as `Naive`.
+`SeasonalNaive` repeats the value from one season ago instead.
+
+```go
+f, err := forecast.Naive(forecast.NaiveInput{History: []float64{100, 120, 90, 110}})
+
+f, err = forecast.SeasonalNaive(forecast.SeasonalNaiveInput{
+	History: []float64{100, 120, 90, 110, 105, 125, 95, 115}, SeasonLength: 4, PeriodsAhead: 1,
+})
+```
+
 ## Classification
 
 The `abc` package prioritizes which SKUs deserve tighter inventory control:
@@ -605,8 +656,9 @@ site, err := logistics.CenterOfGravity(logistics.CenterOfGravityInput{
 // warehouse: picks per hour.
 rate, err := warehouse.PickRate(warehouse.PickRateInput{TotalPicks: 480, TotalHours: 8})
 
-// quality: process capability index.
+// quality: process capability index, and DPMO converted to a sigma level.
 cpk, err := quality.Cpk(quality.CpkInput{USL: 10.5, LSL: 9.5, Mean: 10.1, Sigma: 0.1})
+sigma, err := quality.SigmaLevel(3.4) // ~6.0, the classic "Six Sigma" reference point
 
 // finance: cash-to-cash cycle time (DIO can come from inventory.DaysOfInventoryOnHand).
 c2c, err := finance.CashToCashCycleTime(finance.CashToCashCycleTimeInput{
@@ -646,6 +698,7 @@ See [SECURITY.md](SECURITY.md) for the project's security scope and how to repor
 - `SafetyStockWithVariableLeadTime` reduces to `SafetyStockWithServiceLevel` when lead-time variability is zero
 - `FillRateSafetyStock`'s result can be negative for a low enough target fill rate — that's not a bug; `ExpectedFillRate` accepts a negative safety stock accordingly
 - `EOQWithQuantityDiscounts` evaluates each price tier's own EOQ clamped to that tier's valid range, and returns whichever tier/quantity minimizes total annual cost
+- `EOI` requires `AnnualDemand` strictly greater than zero, unlike `EOQ`, which allows zero — `EOI` divides by it
 
 **`forecast`**
 
@@ -656,6 +709,8 @@ See [SECURITY.md](SECURITY.md) for the project's security scope and how to repor
 - `HoltWinters` uses additive seasonality only, needs at least two full seasons of history, and documents its exact initialization convention in its doc comment (there's more than one in the literature — verify against your own reference if you need to match a specific one)
 - `TrackingSignal` returns one value per period (for monitoring drift over time), not a single summary value
 - `MASE`'s `TrainingHistory` must not be perfectly constant (see `ErrZeroNaiveMAE`)
+- `ClassifyDemandPattern` uses the Syntetos & Boylan (2005) cutoffs (ADI = 1.32, CV² = 0.49) as fixed constants, not caller-configurable — unlike `abc.Classify`'s thresholds, this is a standardized technique, not an organization-specific policy
+- `SBA` takes the same `CrostonInput` as `Croston` and only adjusts the final `Forecast`; `DemandSize` and `Interval` are unchanged
 
 **`abc`**
 
@@ -691,6 +746,7 @@ See [SECURITY.md](SECURITY.md) for the project's security scope and how to repor
 - `Cp`/`Cpk` assume a normal process distribution
 - `Cpk`'s `Mean` may fall outside `[LSL, USL]`; a resulting negative value reflects a genuinely out-of-tolerance process, not invalid input
 - `CostOfQuality` uses the standard four-category breakdown as named fields, not a caller-supplied component list (unlike `procurement`'s landed cost/TCO), since this categorization is close to universal
+- `SigmaLevel` requires DPMO strictly between 0 and 1,000,000 and uses the conventional 1.5-sigma shift
 
 **`finance`**
 
@@ -738,7 +794,7 @@ This project follows semantic versioning.
 - `v0.5.0` added policy summary helpers and improved API consistency for inventory planning workflows
 - `v0.6.0` focused on documentation tightening, package consistency, and API stabilization ahead of `v1.0.0`
 - `v1.0.0` is the first stable release of the `inventory` package
-- `Unreleased` adds seven new packages (`abc`, `procurement`, `production`, `logistics`, `warehouse`, `quality`, `finance`), several `inventory` extensions (variable-lead-time and fill-rate safety stock, EPQ, quantity-discount EOQ, newsvendor, inventory ratios), several `forecast` extensions (Holt-Winters, tracking signal, linear trend, MASE), and batch policy-summary helpers; see [CHANGELOG.md](CHANGELOG.md)
+- `Unreleased` adds seven new packages (`abc`, `procurement`, `production`, `logistics`, `warehouse`, `quality`, `finance`), several `inventory` extensions (variable-lead-time and fill-rate safety stock, EPQ, quantity-discount EOQ, newsvendor, inventory ratios, EOI, safety time), several `forecast` extensions (Holt-Winters, tracking signal, linear trend, MASE, demand pattern classification, SBA, naive/seasonal naive), `quality.SigmaLevel`, and batch policy-summary helpers; see [CHANGELOG.md](CHANGELOG.md)
 
 ## Documentation
 

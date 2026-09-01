@@ -26,6 +26,7 @@
 //   - Economic order quantity across a quantity discount schedule
 //   - Newsvendor (single-period) optimal order quantity
 //   - Inventory turnover, days of inventory on hand, and GMROI
+//   - Economic order interval (EOI) and safety time
 //
 // The formulas in this package are intentionally simple and transparent.
 // They are designed for practical use in applications, internal tools,
@@ -61,6 +62,8 @@
 //   - EOQWithQuantityDiscounts evaluates each price tier's own EOQ,
 //     clamped to that tier's valid quantity range, and returns whichever
 //     tier/quantity combination minimizes total annual cost.
+//   - EOI requires AnnualDemand strictly greater than zero (unlike EOQ,
+//     which allows zero), since EOI divides by it.
 //   - This package does not include demand forecasting (see the sibling
 //     github.com/motah-fard/scmgo/forecast package), stochastic
 //     optimization, or multi-echelon inventory models (a guaranteed-service

@@ -200,3 +200,45 @@ type MASEInput struct {
 	// period-for-period with Actual. Must be the same length as Actual.
 	Forecast []float64
 }
+
+// DemandClassificationInput contains the inputs required to classify a
+// demand pattern.
+type DemandClassificationInput struct {
+	// History is the chronological demand series, oldest value first,
+	// where zero denotes a period with no demand. At least one non-zero
+	// period is required.
+	History []float64
+}
+
+// DemandClassificationResult contains the outputs of a demand pattern
+// classification.
+type DemandClassificationResult struct {
+	// ADI is the average demand interval: the number of periods in
+	// History divided by the number of non-zero periods.
+	ADI float64
+	// CV2 is the squared coefficient of variation of demand size
+	// (computed over non-zero periods only): (StdDev/Mean)².
+	CV2 float64
+	// Class is "smooth", "intermittent", "erratic", or "lumpy".
+	Class string
+}
+
+// NaiveInput contains the inputs required to calculate a naive forecast.
+type NaiveInput struct {
+	// History is the chronological demand series, oldest value first.
+	History []float64
+}
+
+// SeasonalNaiveInput contains the inputs required to calculate a seasonal
+// naive forecast.
+type SeasonalNaiveInput struct {
+	// History is the chronological demand series, oldest value first.
+	// Must contain at least SeasonLength periods.
+	History []float64
+	// SeasonLength is the number of periods per season. Must be at least
+	// 2.
+	SeasonLength int
+	// PeriodsAhead is the forecast horizon, in periods, and must be
+	// greater than zero.
+	PeriodsAhead int
+}

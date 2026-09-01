@@ -250,3 +250,28 @@ func FuzzGMROI(f *testing.F) {
 		}
 	})
 }
+
+func FuzzEOI(f *testing.F) {
+	f.Add(10000.0, 50.0, 2.0, 365.0)
+	f.Fuzz(func(t *testing.T, annualDemand, orderingCost, holdingCostPerUnit, daysPerYear float64) {
+		result, err := EOI(EOIInput{
+			AnnualDemand:       annualDemand,
+			OrderingCost:       orderingCost,
+			HoldingCostPerUnit: holdingCostPerUnit,
+			DaysPerYear:        daysPerYear,
+		})
+		if err == nil && math.IsNaN(result) {
+			t.Fatalf("EOI returned NaN with nil error")
+		}
+	})
+}
+
+func FuzzSafetyTime(f *testing.F) {
+	f.Add(50.0, 20.0)
+	f.Fuzz(func(t *testing.T, safetyStockUnits, avgDailyDemand float64) {
+		result, err := SafetyTime(SafetyTimeInput{SafetyStockUnits: safetyStockUnits, AvgDailyDemand: avgDailyDemand})
+		if err == nil && math.IsNaN(result) {
+			t.Fatalf("SafetyTime returned NaN with nil error")
+		}
+	})
+}

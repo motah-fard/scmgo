@@ -164,3 +164,50 @@ func FuzzMASE(f *testing.F) {
 		}
 	})
 }
+
+func FuzzClassifyDemandPattern(f *testing.F) {
+	f.Add(0.0, 0.0, 5.0, 0.0, 3.0)
+	f.Fuzz(func(t *testing.T, a, b, c, d, e float64) {
+		result, err := ClassifyDemandPattern(DemandClassificationInput{History: []float64{a, b, c, d, e}})
+		if err != nil {
+			return
+		}
+		if math.IsNaN(result.ADI) || math.IsNaN(result.CV2) {
+			t.Fatalf("ClassifyDemandPattern returned NaN field with nil error: %+v", result)
+		}
+	})
+}
+
+func FuzzSBA(f *testing.F) {
+	f.Add(0.0, 0.0, 5.0, 0.0, 3.0, 0.2)
+	f.Fuzz(func(t *testing.T, a, b, c, d, e, alpha float64) {
+		result, err := SBA(CrostonInput{History: []float64{a, b, c, d, e}, Alpha: alpha})
+		if err == nil && math.IsNaN(result.Forecast) {
+			t.Fatalf("SBA returned NaN forecast with nil error")
+		}
+	})
+}
+
+func FuzzNaive(f *testing.F) {
+	f.Add(100.0, 120.0, 90.0)
+	f.Fuzz(func(t *testing.T, a, b, c float64) {
+		result, err := Naive(NaiveInput{History: []float64{a, b, c}})
+		if err == nil && math.IsNaN(result) {
+			t.Fatalf("Naive returned NaN with nil error")
+		}
+	})
+}
+
+func FuzzSeasonalNaive(f *testing.F) {
+	f.Add(100.0, 120.0, 90.0, 110.0, 1)
+	f.Fuzz(func(t *testing.T, a, b, c, d float64, periodsAhead int) {
+		result, err := SeasonalNaive(SeasonalNaiveInput{
+			History:      []float64{a, b, c, d},
+			SeasonLength: 4,
+			PeriodsAhead: periodsAhead,
+		})
+		if err == nil && math.IsNaN(result) {
+			t.Fatalf("SeasonalNaive returned NaN with nil error")
+		}
+	})
+}

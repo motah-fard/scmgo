@@ -1,6 +1,6 @@
 package inventory
 
-import "math"
+import "github.com/motah-fard/scmgo/internal/numeric"
 
 // ZScoreForServiceLevel returns the standard normal z-score
 // corresponding to the given cycle service level.
@@ -20,6 +20,5 @@ func ZScoreForServiceLevel(serviceLevel float64) (float64, error) {
 		return 0, ErrInvalidServiceLevel
 	}
 
-	z := math.Sqrt2 * math.Erfinv(2*serviceLevel-1)
-	return z, nil
+	return numeric.InverseNormalCDF(serviceLevel), nil
 }

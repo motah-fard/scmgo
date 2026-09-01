@@ -14,6 +14,10 @@
 //   - Running tracking signal, for monitoring forecast drift
 //   - Linear regression trend forecast
 //   - Mean absolute scaled error (MASE)
+//   - Demand pattern classification (Syntetos & Boylan): smooth,
+//     intermittent, erratic, or lumpy
+//   - SBA (Syntetos-Boylan Approximation), a bias correction to Croston
+//   - Naive and seasonal naive forecasts
 //
 // Important assumptions:
 //
@@ -46,6 +50,13 @@
 //   - MASE's TrainingHistory must not be perfectly constant (a naive
 //     one-step forecast on a constant series has zero error, making MASE's
 //     scaling denominator zero — see ErrZeroNaiveMAE).
+//   - ClassifyDemandPattern uses the Syntetos & Boylan (2005) cutoffs
+//     (ADI = 1.32, CV² = 0.49) as fixed constants, not caller-configurable
+//     thresholds — unlike abc.Classify's AThreshold/BThreshold, these are a
+//     standardized technique with fixed cutoffs in the original paper, not
+//     an organization-specific policy choice.
+//   - SBA takes the same CrostonInput as Croston and only adjusts the
+//     final Forecast; DemandSize and Interval are unchanged.
 //   - This package does not perform model selection, parameter fitting
 //     (e.g. optimal alpha/beta search), seasonality decomposition, or
 //     ARIMA/ML-based forecasting. It computes the classical formulas given

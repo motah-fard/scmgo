@@ -9,5 +9,6 @@ var (
 	ErrInvalidSpecLimits    = errors.New("upper spec limit must be greater than lower spec limit")
 	ErrInvalidSigma         = errors.New("sigma must be greater than zero")
 	ErrNegativeCost         = errors.New("cost cannot be negative")
+	ErrInvalidDPMO          = errors.New("DPMO must be strictly between 0 and 1,000,000")
 	ErrNonFiniteInput       = errors.New("input values must be finite (not NaN or Inf)")
 )

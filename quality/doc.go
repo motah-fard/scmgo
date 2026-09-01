@@ -6,6 +6,7 @@
 //   - Cp: process capability (spread vs. tolerance)
 //   - Cpk: process capability index (spread and centering vs. tolerance)
 //   - CostOfQuality: prevention, appraisal, and failure cost breakdown
+//   - SigmaLevel: converts DPMO to a Six-Sigma process sigma level
 //
 // Important assumptions:
 //
@@ -21,4 +22,8 @@
 //     TotalCostOfOwnership, because this categorization is close to
 //     universal in quality management, unlike landed cost or TCO
 //     categories which vary by industry.
+//   - SigmaLevel requires DPMO strictly between 0 and 1,000,000: at either
+//     boundary the resulting yield is exactly 1 or 0, and the inverse
+//     normal CDF behind the conversion is undefined (an infinity) there.
+//     It uses the conventional 1.5-sigma shift.
 package quality
