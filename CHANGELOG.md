@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added (quality package)
+- New `quality` package: `DPMO`, `Cp`/`Cpk` (assume a normal process
+  distribution; `Cpk`'s `Mean` may fall outside `[LSL, USL]`, and a
+  resulting negative value reflects a genuinely out-of-tolerance process
+  rather than being rejected), and `CostOfQuality` (the standard four-
+  category prevention/appraisal/internal-failure/external-failure
+  breakdown, used directly as named fields rather than a caller-supplied
+  component list, since this categorization is close to universal in
+  quality management). Full tests, examples, fuzz targets; 97.1% coverage.
+
 ### Added (warehouse package)
 - New `warehouse` package: `StorageUtilization`, `CubeUtilization` (neither
   clamped — a value above 1 signals overcommitted storage), and `PickRate`.

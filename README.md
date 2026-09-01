@@ -15,6 +15,7 @@
 - **`production`** — OEE, Little's Law (all three directions), and takt time.
 - **`logistics`** — dimensional/billable weight, freight cost allocation, vehicle utilization, and center-of-gravity facility location.
 - **`warehouse`** — storage utilization, cube utilization, and pick rate.
+- **`quality`** — DPMO, process capability (Cp/Cpk), and cost of quality.
 
 See [Roadmap](#roadmap) for planned packages.
 
@@ -114,6 +115,13 @@ unreleased and could still change before the next tag.
 - `CubeUtilization`
 - `PickRate`
 
+### `quality`
+
+- `DPMO`
+- `Cp`
+- `Cpk`
+- `CostOfQuality`
+
 ## Why scmgo
 
 Many inventory and supply-chain calculations still live in spreadsheets, internal notes, or one-off scripts. `scmgo` provides a lightweight Go-native alternative for developers building:
@@ -136,6 +144,7 @@ go get github.com/motah-fard/scmgo/procurement@latest
 go get github.com/motah-fard/scmgo/production@latest
 go get github.com/motah-fard/scmgo/logistics@latest
 go get github.com/motah-fard/scmgo/warehouse@latest
+go get github.com/motah-fard/scmgo/quality@latest
 ```
 
 ## Packages
@@ -147,6 +156,7 @@ go get github.com/motah-fard/scmgo/warehouse@latest
 - `github.com/motah-fard/scmgo/production`
 - `github.com/motah-fard/scmgo/logistics`
 - `github.com/motah-fard/scmgo/warehouse`
+- `github.com/motah-fard/scmgo/quality`
 
 ## Quick Start
 
