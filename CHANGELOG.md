@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed (CI)
+- **Every CI run has failed on the `lint` job since the workflow was
+  added.** `golangci-lint-action@v6` does not support golangci-lint v2 (per
+  the action's own compatibility table: v7+ is required for v2, v8+ for
+  v2.1+) — but the workflow's `version: latest` always resolves to the
+  newest v2.x. This went undetected because local runs (`go install
+  .../golangci-lint@latest` + `golangci-lint run`) used a different
+  install path than the Action and passed fine; only checking the actual
+  GitHub Actions run status (not just local output) surfaced it. Bumped to
+  `golangci-lint-action@v9` and pinned `version: v2.13` instead of
+  `latest`, both matching the action's own current documented example —
+  pinning also means a future golangci-lint release can't silently start
+  failing CI on an unrelated push the way "latest" just did here.
+
 ### Added (six follow-up functions)
 - `quality.SigmaLevel` — converts DPMO to a Six-Sigma process sigma level
   (the conventional 1.5-sigma shift). Extracted the shared inverse-normal-
