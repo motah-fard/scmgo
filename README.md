@@ -16,8 +16,7 @@
 - **`logistics`** — dimensional/billable weight, freight cost allocation, vehicle utilization, and center-of-gravity facility location.
 - **`warehouse`** — storage utilization, cube utilization, and pick rate.
 - **`quality`** — DPMO, process capability (Cp/Cpk), and cost of quality.
-
-See [Roadmap](#roadmap) for planned packages.
+- **`finance`** — DSO, DPO, cash-to-cash cycle time, and perfect order rate.
 
 The goal is to keep the API:
 
@@ -28,13 +27,12 @@ The goal is to keep the API:
 
 ## Stability
 
-The `inventory` package's public API is stable as of `v1.0.0`. The `forecast`
-and `abc` packages are new and, while tested to the same standard (see
-[Current Scope](#current-scope)), have not yet shipped in a tagged release —
-their APIs should be considered provisional until the next version tag.
-Recent additions to `inventory` itself (everything under
-[Beyond Cycle Service Level](#beyond-cycle-service-level)) are likewise
-unreleased and could still change before the next tag.
+The `inventory` package's public API is stable as of `v1.0.0`. Every other
+package listed above, and every `inventory` addition under
+[Beyond Cycle Service Level](#beyond-cycle-service-level), is new — tested
+to the same standard (see [Current Scope](#current-scope)) but not yet
+shipped in a tagged release, so treat their APIs as provisional until the
+next version tag.
 
 ## Current Scope
 
@@ -122,6 +120,13 @@ unreleased and could still change before the next tag.
 - `Cpk`
 - `CostOfQuality`
 
+### `finance`
+
+- `DSO`
+- `DPO`
+- `CashToCashCycleTime`
+- `PerfectOrderRate`
+
 ## Why scmgo
 
 Many inventory and supply-chain calculations still live in spreadsheets, internal notes, or one-off scripts. `scmgo` provides a lightweight Go-native alternative for developers building:
@@ -145,6 +150,7 @@ go get github.com/motah-fard/scmgo/production@latest
 go get github.com/motah-fard/scmgo/logistics@latest
 go get github.com/motah-fard/scmgo/warehouse@latest
 go get github.com/motah-fard/scmgo/quality@latest
+go get github.com/motah-fard/scmgo/finance@latest
 ```
 
 ## Packages
@@ -157,6 +163,7 @@ go get github.com/motah-fard/scmgo/quality@latest
 - `github.com/motah-fard/scmgo/logistics`
 - `github.com/motah-fard/scmgo/warehouse`
 - `github.com/motah-fard/scmgo/quality`
+- `github.com/motah-fard/scmgo/finance`
 
 ## Quick Start
 
@@ -566,6 +573,47 @@ results, err := abc.Classify(abc.ClassifyInput{
 resorted by value), so it's index-aligned with `ClassifyVariability`'s
 result for the same item set and easy to feed into `Combine`.
 
+## Other Domains
+
+`procurement`, `production`, `logistics`, `warehouse`, `quality`, and
+`finance` are each small (3-5 function) packages — full details are in
+their doc comments and runnable `Example`s on pkg.go.dev. A taste of each:
+
+```go
+// procurement: sum labeled, possibly-negative cost components.
+landed, err := procurement.LandedCost(procurement.LandedCostInput{
+	Components: []procurement.CostComponent{
+		{Label: "Unit Cost", Amount: 100},
+		{Label: "Freight", Amount: 15},
+	},
+})
+
+// production: OEE from raw availability/performance/quality inputs.
+oee, err := production.OEE(production.OEEInput{
+	PlannedProductionTime: 480, RunTime: 420,
+	IdealCycleTime: 1.0, TotalCount: 400, GoodCount: 385,
+})
+
+// logistics: demand-weighted centroid for facility location.
+site, err := logistics.CenterOfGravity(logistics.CenterOfGravityInput{
+	Locations: []logistics.LocationDemand{
+		{X: 10, Y: 20, Demand: 500},
+		{X: 30, Y: 40, Demand: 300},
+	},
+})
+
+// warehouse: picks per hour.
+rate, err := warehouse.PickRate(warehouse.PickRateInput{TotalPicks: 480, TotalHours: 8})
+
+// quality: process capability index.
+cpk, err := quality.Cpk(quality.CpkInput{USL: 10.5, LSL: 9.5, Mean: 10.1, Sigma: 0.1})
+
+// finance: cash-to-cash cycle time (DIO can come from inventory.DaysOfInventoryOnHand).
+c2c, err := finance.CashToCashCycleTime(finance.CashToCashCycleTimeInput{
+	DIO: 60.83, DSO: 30.42, DPO: 36.5,
+})
+```
+
 ## Design Principles
 
 `scmgo` is intentionally designed to be:
@@ -616,30 +664,68 @@ See [SECURITY.md](SECURITY.md) for the project's security scope and how to repor
 - `ClassifyVariability` requires `MeanDemand` to be strictly positive (the coefficient of variation is undefined at mean zero)
 - `Combine` is an inner join on ID: an item present in only one input is omitted, not defaulted
 
+**`procurement`**
+
+- `LandedCost` and `TotalCostOfOwnership` sum a caller-supplied labeled cost component list rather than a fixed category set, since categories vary too much by industry; a component's amount may be negative (a rebate, credit, or resale value)
+- `PurchasePriceVariance` follows the standard-costing convention: positive = favorable (paid less than standard)
+
+**`production`**
+
+- `OEE` computes Availability/Performance/Quality from raw inputs, not precomputed ratios, and is not clamped to `[0, 1]`
+- Little's Law is three explicitly named functions (one per "solve for X"), not one function with an implicit unknown parameter
+- Does not include BOM explosion or lot-sizing algorithms — see [Roadmap](#roadmap)
+
+**`logistics`**
+
+- `DimensionalWeight`'s divisor (`DimFactor`) is caller-supplied, not a hardcoded carrier constant
+- `VehicleUtilization` is not clamped: a value above 1 signals an overloaded vehicle
+- `CenterOfGravity` computes a straight-line (Euclidean) centroid, not road-network distance
+
+**`warehouse`**
+
+- `StorageUtilization` and `CubeUtilization` are not clamped: a value above 1 signals overcommitted storage
+- No separate velocity-based slotting function — use `abc.Classify` with pick velocity as the value metric
+
+**`quality`**
+
+- `Cp`/`Cpk` assume a normal process distribution
+- `Cpk`'s `Mean` may fall outside `[LSL, USL]`; a resulting negative value reflects a genuinely out-of-tolerance process, not invalid input
+- `CostOfQuality` uses the standard four-category breakdown as named fields, not a caller-supplied component list (unlike `procurement`'s landed cost/TCO), since this categorization is close to universal
+
+**`finance`**
+
+- `CashToCashCycleTime` takes DIO/DSO/DPO as direct inputs rather than recomputing them, so DIO can come from `inventory.DaysOfInventoryOnHand` or anywhere else; the result itself may be negative (a real, favorable outcome), even though each of DIO/DSO/DPO individually must be non-negative
+- `PerfectOrderRate` multiplies its four component rates, assuming independence — treat the result as an upper-bound estimate if failure modes are correlated in your operation
+
 Full assumptions and exclusions are documented in each package's `doc.go`.
 
 ## Roadmap
 
-Planned packages, each following the same Input-struct/validate/sentinel-error
-pattern as `inventory`, `forecast`, and `abc` (see [CONTRIBUTING.md](CONTRIBUTING.md)).
-Not yet started — contributions and formula proposals (with a citation) are
-welcome via issues.
+The originally planned domain packages (`procurement`, `production`,
+`logistics`, `warehouse`, `quality`, `finance`) have all shipped, alongside
+`abc` and a round of `inventory`/`forecast` extensions — see
+[Current Scope](#current-scope) for the full function list and
+[CHANGELOG.md](CHANGELOG.md) for how each arrived.
 
-- **`procurement`** — landed cost, purchase price variance, total cost of ownership
-- **`production`** — BOM explosion, lot sizing, OEE, Little's Law
-- **`logistics`** — freight cost allocation, dimensional weight, center-of-gravity facility location
-- **`warehouse`** — storage/cube utilization, pick rate, slotting
-- **`quality`** — DPMO, process capability (Cp/Cpk), cost of quality
-- **`finance`** — cash-to-cash cycle time, perfect order rate
+What's deliberately still out, because each is a genuinely different kind
+of problem from the closed-form/numerically-inverted formulas that make up
+the rest of this library — not a missing extension of them, and rushing
+one in to pad the function count would risk shipping something wrong:
 
-**Explicitly not planned:** a general multi-echelon safety stock/allocation
-package. The guaranteed-service multi-echelon model needs network topology
-and NP-hard optimization over a DAG of stocking locations — a fundamentally
-different kind of problem from the closed-form/numerically-inverted formulas
-elsewhere in this library, not an extension of them. `EOQ` with quantity
-discounts and fill-rate safety stock (both closed-form/numerical, not
-network problems) already shipped in `inventory` rather than waiting for a
-`procurement`/`fillrate` package.
+- **BOM explosion** (`production`) — a graph-traversal problem (with cycle
+  detection), not a formula
+- **Lot-sizing algorithms** (Wagner-Whitin, Silver-Meal, Part-Period
+  Balancing) — dynamic-programming/heuristic optimization, not a formula
+- **Multi-echelon safety stock/allocation** — the guaranteed-service model
+  needs network topology and NP-hard optimization over a DAG of stocking
+  locations
+- **Vehicle routing (VRP) / network optimization** (`logistics`) — needs a
+  solver, not a closed-form formula
+
+Contributions and formula proposals (with a citation) for any of the above,
+or for a formula this library is still missing, are welcome via issues —
+see [CONTRIBUTING.md](CONTRIBUTING.md) for the package pattern every
+function here follows.
 
 ## Versioning
 
@@ -652,11 +738,11 @@ This project follows semantic versioning.
 - `v0.5.0` added policy summary helpers and improved API consistency for inventory planning workflows
 - `v0.6.0` focused on documentation tightening, package consistency, and API stabilization ahead of `v1.0.0`
 - `v1.0.0` is the first stable release of the `inventory` package
-- `Unreleased` adds the `forecast` and `abc` packages, several `inventory` extensions (variable-lead-time and fill-rate safety stock, EPQ, quantity-discount EOQ, newsvendor, inventory ratios), several `forecast` extensions (Holt-Winters, tracking signal, linear trend, MASE), and batch policy-summary helpers; see [CHANGELOG.md](CHANGELOG.md)
+- `Unreleased` adds seven new packages (`abc`, `procurement`, `production`, `logistics`, `warehouse`, `quality`, `finance`), several `inventory` extensions (variable-lead-time and fill-rate safety stock, EPQ, quantity-discount EOQ, newsvendor, inventory ratios), several `forecast` extensions (Holt-Winters, tracking signal, linear trend, MASE), and batch policy-summary helpers; see [CHANGELOG.md](CHANGELOG.md)
 
 ## Documentation
 
-- Go package docs: [pkg.go.dev/github.com/motah-fard/scmgo/inventory](https://pkg.go.dev/github.com/motah-fard/scmgo/inventory), [pkg.go.dev/github.com/motah-fard/scmgo/forecast](https://pkg.go.dev/github.com/motah-fard/scmgo/forecast), [pkg.go.dev/github.com/motah-fard/scmgo/abc](https://pkg.go.dev/github.com/motah-fard/scmgo/abc)
+- Go package docs: [pkg.go.dev/github.com/motah-fard/scmgo](https://pkg.go.dev/github.com/motah-fard/scmgo) lists every package below it — [inventory](https://pkg.go.dev/github.com/motah-fard/scmgo/inventory), [forecast](https://pkg.go.dev/github.com/motah-fard/scmgo/forecast), [abc](https://pkg.go.dev/github.com/motah-fard/scmgo/abc), [procurement](https://pkg.go.dev/github.com/motah-fard/scmgo/procurement), [production](https://pkg.go.dev/github.com/motah-fard/scmgo/production), [logistics](https://pkg.go.dev/github.com/motah-fard/scmgo/logistics), [warehouse](https://pkg.go.dev/github.com/motah-fard/scmgo/warehouse), [quality](https://pkg.go.dev/github.com/motah-fard/scmgo/quality), [finance](https://pkg.go.dev/github.com/motah-fard/scmgo/finance)
 - Releases: [github.com/motah-fard/scmgo/releases](https://github.com/motah-fard/scmgo/releases)
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Security policy: [SECURITY.md](SECURITY.md)

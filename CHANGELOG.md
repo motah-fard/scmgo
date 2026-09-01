@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added (finance package)
+- New `finance` package: `DSO`, `DPO`, `CashToCashCycleTime` (takes DIO/
+  DSO/DPO as direct inputs rather than recomputing them, so DIO can come
+  from `inventory.DaysOfInventoryOnHand`; the result itself may be
+  negative — a real, favorable outcome — even though each input must be
+  individually non-negative), and `PerfectOrderRate` (multiplies its four
+  component rates, assuming independence — documented as an upper-bound
+  estimate if failure modes are correlated). This is the last of the
+  planned domain packages; see the Roadmap section of README.md for what's
+  deliberately still excluded and why. Full tests, examples, fuzz targets;
+  100% coverage.
+
 ### Added (quality package)
 - New `quality` package: `DPMO`, `Cp`/`Cpk` (assume a normal process
   distribution; `Cpk`'s `Mean` may fall outside `[LSL, USL]`, and a
