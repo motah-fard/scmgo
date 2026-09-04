@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- `examples/` — five runnable, `go run`-able workflow programs (not part
+  of the importable API): `inventory-policy`, `forecasting`,
+  `intermittent-demand`, `abc-xyz`, and `retail` (a multi-SKU pipeline
+  chaining demand classification, forecasting, ABC classification, and
+  policy calculation end to end). Each was run and its output verified,
+  not just compiled.
+
+### Changed
+- Repositioned the README's opening from "a Go library for practical
+  supply-chain calculations" to lead with what it actually covers
+  (inventory optimization, forecasting, ABC/XYZ, procurement, production,
+  logistics, warehouse, quality, finance) and who it's for, per a
+  positioning review — no functional change.
+- Removed the `Go Report Card` badge: the service was sunset by its
+  maintainers: the badge endpoint now permanently renders "retired"
+  instead of a grade.
 
 ## [v1.1.0] - 2026-08-31
 ### Fixed (CI)

@@ -5,7 +5,19 @@
 [![License](https://img.shields.io/github/license/motah-fard/scmgo?color=blue)](https://github.com/motah-fard/scmgo/blob/main/LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/motah-fard/scmgo)](https://github.com/motah-fard/scmgo/releases)
 
-`scmgo` is a Go library for practical supply-chain calculations, organized as one package per domain.
+`scmgo` is a supply-chain analytics and optimization library for Go, providing
+inventory optimization, EOQ, safety stock, reorder points, demand
+forecasting, intermittent-demand forecasting, ABC/XYZ analysis,
+procurement, production, logistics, warehouse, quality, and financial
+calculations — one of the more comprehensive Go-native supply-chain
+toolkits available, organized as one focused package per domain rather
+than a single grab-bag of functions.
+
+If you're building inventory or warehouse software, an ERP/e-commerce
+integration that needs planning calculations, a manufacturing or
+procurement system, an internal operations service, or a supply-chain
+startup's backend — and you'd rather not re-derive EOQ or reorder-point
+math by hand for the third time — this is meant for you.
 
 - **`inventory`** — reorder point, safety stock (fixed and variable lead time), EOQ (plain, quantity-discount, and production-quantity variants), fill-rate and cycle-service-level models, newsvendor, min/max levels, lead-time demand helpers, inventory ratios, and policy summary helpers (including batch helpers for SKU lists).
 - **`forecast`** — demand forecasting to feed the `inventory` package's inputs: moving average, weighted moving average, simple exponential smoothing, Holt's linear trend, Croston's method for intermittent demand, and forecast accuracy metrics (MAD, MAPE, Bias, RMSE).
@@ -200,6 +212,18 @@ func main() {
 	fmt.Printf("reorder point: %.0f\n", summary.ReorderPoint)
 	fmt.Printf("target level: %.0f\n", summary.TargetInventoryLevel)
 }
+```
+
+## Examples
+
+For a complete, `go run`-able workflow rather than one isolated call, see
+[`examples/`](examples/) — demand + lead time → full inventory policy,
+one series through several forecast methods compared on accuracy,
+intermittent-demand forecasting, ABC/XYZ classification, and a
+multi-SKU pipeline that chains all three (`examples/retail`) end to end:
+
+```bash
+go run ./examples/retail
 ```
 
 ## Policy Summary Helpers
