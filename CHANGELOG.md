@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [v1.1.1] - 2026-09-04
 ### Added
 - `examples/` — five runnable, `go run`-able workflow programs (not part
   of the importable API): `inventory-policy`, `forecasting`,
