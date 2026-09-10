@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- `internal/parallel.Map` — a generic, bounded-worker (`runtime.GOMAXPROCS(0)`)
+  parallel map over a slice: fan-out over contiguous index ranges into a
+  pre-allocated results slice, so goroutine count stays bounded regardless
+  of input size and no lock is needed (verified with `-race`).
+- `inventory.BuildPolicySummaryBatchConcurrent` and
+  `BuildPolicySummaryWithServiceLevelBatchConcurrent` — drop-in concurrent
+  replacements for the existing batch functions (same inputs, same
+  results, same order). Measured crossover on this project's development
+  hardware: sequential faster below ~2,000-3,000 items, concurrent
+  clearly faster above it.
+- `abc.ClassifyVariabilityConcurrent` — same idea for XYZ classification.
+  `abc.Classify` (ABC/Pareto) deliberately has no concurrent variant: its
+  cumulative-percent step has a real sequential dependency, so it isn't
+  embarrassingly parallel.
+- `examples/concurrent-batch` — measures sequential vs. concurrent at a
+  few batch sizes on the machine running it, rather than asking readers
+  to trust a number in a doc comment.
+
+### Fixed (found while building the above)
+- The first version of `ClassifyVariabilityConcurrent` carried a
+  per-item error alongside each result through the parallel pass, so it
+  could report which item failed without a second scan. Benchmarking
+  showed that bookkeeping cost as much as the parallelism saved -- it
+  never beat the sequential version, even at 100,000 items. Replaced
+  with a design that validates every item sequentially first (in input
+  order, preserving the exact fail-fast error semantics trivially) and
+  only parallelizes the now-infallible division step. This is exactly
+  why every `Concurrent` variant ships with `Sizes` benchmarks, not just
+  a "should be faster" assumption -- also enforced now in
+  `CONTRIBUTING.md`'s new `Concurrent`-variant checklist.
+
+### CI
+- Added `-race` to the fuzz job (previously only the main test job ran
+  with it) -- a data race is the actual failure mode concurrent code
+  introduces that fuzzing without `-race` won't catch.
 
 ## [v1.1.1] - 2026-09-04
 ### Added

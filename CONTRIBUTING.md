@@ -93,6 +93,22 @@ Conventions to follow:
    over an unbounded range), assert that too — that's the exact class of
    bug `validateFinite` exists to catch, and a fuzz target is what proves
    the fix and guards against it coming back.
+10. **A `Concurrent` variant is earned, not assumed.** Don't add one just
+    because a function processes a slice — most of this library's formulas
+    are too cheap for goroutine overhead to pay for itself below the
+    thousands of items. Before adding one: (a) confirm the per-item work is
+    actually independent (no running total, no shared state across items —
+    `abc.Classify`'s cumulative percent is the counterexample: it has a real
+    sequential dependency and has no `Concurrent` variant for exactly that
+    reason); (b) build it on `internal/parallel.Map`, not a hand-rolled
+    goroutine loop; (c) add `Benchmark<Func>Sizes` and
+    `Benchmark<Func>ConcurrentSizes` pairs at a few sizes (100 /
+    1,000 / 10,000 / 100,000 is a reasonable start) and report the actual
+    measured crossover in the doc comment — not a guess; (d) add a fuzz
+    target asserting the `Concurrent` version matches the sequential one
+    exactly, and run it with `-race` (this project's CI fuzz job already
+    does) since a data race is the actual failure mode concurrency
+    introduces that fuzzing without `-race` won't catch.
 
 ## Before opening a PR
 

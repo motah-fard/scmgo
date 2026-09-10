@@ -27,6 +27,8 @@
 //   - Newsvendor (single-period) optimal order quantity
 //   - Inventory turnover, days of inventory on hand, and GMROI
 //   - Economic order interval (EOI) and safety time
+//   - Concurrent variants of the batch policy summary helpers, for large
+//     SKU lists
 //
 // The formulas in this package are intentionally simple and transparent.
 // They are designed for practical use in applications, internal tools,
@@ -64,6 +66,15 @@
 //     tier/quantity combination minimizes total annual cost.
 //   - EOI requires AnnualDemand strictly greater than zero (unlike EOQ,
 //     which allows zero), since EOI divides by it.
+//   - BuildPolicySummaryBatchConcurrent and
+//     BuildPolicySummaryWithServiceLevelBatchConcurrent return exactly
+//     what their sequential counterparts do, just computed across
+//     multiple goroutines. They are not faster by default: for a batch
+//     of formulas this cheap, goroutine overhead costs more than it
+//     saves below a few thousand items (see their doc comments and
+//     benchmarks for the measured crossover). Use the sequential
+//     versions unless you've measured a large batch as an actual
+//     bottleneck.
 //   - This package does not include demand forecasting (see the sibling
 //     github.com/motah-fard/scmgo/forecast package), stochastic
 //     optimization, or multi-echelon inventory models (a guaranteed-service

@@ -9,7 +9,7 @@
 //     returns is the Pareto curve itself, so there is no separate
 //     "Pareto analysis" function)
 //   - ClassifyVariability: XYZ classification by demand coefficient of
-//     variation
+//     variation, plus ClassifyVariabilityConcurrent for large item sets
 //   - Combine: joins ABC and XYZ results by item ID into the classic
 //     ABC-XYZ matrix
 //
@@ -28,6 +28,15 @@
 //     is undefined at MeanDemand = 0).
 //   - Combine performs an inner join on ID: an item present in only one of
 //     the two input slices is omitted from the result, not defaulted.
+//   - ClassifyVariabilityConcurrent returns exactly what ClassifyVariability
+//     does, just computed across multiple goroutines; it is not faster by
+//     default, and is only worth it for item sets in the tens of thousands
+//     and up -- see its doc comment and benchmarks for the measured
+//     crossover. Classify (the ABC function) has no concurrent variant:
+//     its cumulative-percent step has a genuine sequential dependency
+//     (each item's cumulative percent depends on the running sum of every
+//     higher-ranked item), so it isn't embarrassingly parallel the way
+//     ClassifyVariability's independent per-item division is.
 //   - This package does not perform time-series-based variability analysis
 //     (e.g. deriving MeanDemand/StdDevDemand from a raw demand history —
 //     see the sibling github.com/motah-fard/scmgo/forecast package for

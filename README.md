@@ -81,6 +81,8 @@ their APIs as newer/less battle-tested than `inventory`'s.
 - `GMROI`
 - `EOI`
 - `SafetyTime`
+- `BuildPolicySummaryBatchConcurrent`
+- `BuildPolicySummaryWithServiceLevelBatchConcurrent`
 
 ### `forecast`
 
@@ -103,6 +105,7 @@ their APIs as newer/less battle-tested than `inventory`'s.
 
 - `Classify`
 - `ClassifyVariability`
+- `ClassifyVariabilityConcurrent`
 - `Combine`
 
 ### `procurement`
@@ -286,6 +289,41 @@ for _, r := range results {
 	fmt.Printf("SKU row %d: ROP=%.0f\n", r.Index, r.Summary.ReorderPoint)
 }
 ```
+
+For a large SKU list, `BuildPolicySummaryBatchConcurrent` and `BuildPolicySummaryWithServiceLevelBatchConcurrent` compute the same batch across multiple goroutines instead of one item at a time — same inputs, same results, same order, just faster past a certain size. See [Concurrency](#concurrency) below for what "a certain size" actually means, measured, not assumed.
+
+## Concurrency
+
+A handful of functions have a `Concurrent` counterpart:
+`inventory.BuildPolicySummaryBatchConcurrent`,
+`inventory.BuildPolicySummaryWithServiceLevelBatchConcurrent`, and
+`abc.ClassifyVariabilityConcurrent`. Each one is a drop-in replacement for
+its sequential counterpart — same inputs, same results, same order —
+computed across `runtime.GOMAXPROCS(0)` goroutines instead of a single
+loop.
+
+**These are not faster by default.** A single call to `BuildPolicySummary`
+takes tens of nanoseconds; spawning goroutines costs more than that. On
+this project's development hardware, sequential stayed faster below a
+few thousand items and concurrent won clearly above it — see
+[`examples/concurrent-batch`](examples/concurrent-batch/main.go) to
+measure the actual crossover on your own machine, and each `Concurrent`
+function's doc comment plus its package's `Benchmark*Sizes` /
+`Benchmark*ConcurrentSizes` pair for the number this project measured.
+Use the plain sequential version by default; reach for `Concurrent` only
+once you've measured a real batch as an actual bottleneck.
+
+```bash
+go run ./examples/concurrent-batch
+```
+
+Not every batch-shaped function has a concurrent variant. `abc.Classify`
+(ABC/Pareto classification) doesn't: its cumulative-percent step has a
+genuine sequential dependency — each item's cumulative percent depends
+on the running sum of every higher-ranked item — so it isn't
+embarrassingly parallel the way `ClassifyVariability`'s independent
+per-item division is. Forcing concurrency onto a genuinely sequential
+algorithm wouldn't make it faster, just more complicated.
 
 ## Available Functions
 
@@ -649,6 +687,11 @@ results, err := abc.Classify(abc.ClassifyInput{
 `Classify`'s result stays in the same order as the input `Items` (not
 resorted by value), so it's index-aligned with `ClassifyVariability`'s
 result for the same item set and easy to feed into `Combine`.
+
+For a large SKU list, `abc.ClassifyVariabilityConcurrent` is a drop-in
+replacement for `ClassifyVariability` that computes across multiple
+goroutines — see [Concurrency](#concurrency) for when it's actually
+worth reaching for.
 
 ## Other Domains
 

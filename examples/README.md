@@ -10,6 +10,7 @@ calls. Each one is `go run`-able directly from the repo root.
 | [`intermittent-demand`](intermittent-demand/main.go) | A sparse SKU → demand-pattern classification, then Croston/SBA forecasting |
 | [`abc-xyz`](abc-xyz/main.go) | A SKU set → ABC (value) and XYZ (variability) classification, combined into the ABC-XYZ matrix |
 | [`retail`](retail/main.go) | The full pipeline for several SKUs at once: classify demand pattern → forecast → ABC class → reorder point → EOQ |
+| [`concurrent-batch`](concurrent-batch/main.go) | The sequential vs. concurrent batch functions, timed against each other at increasing batch sizes, on your own hardware |
 
 ```bash
 go run ./examples/inventory-policy
@@ -17,6 +18,7 @@ go run ./examples/forecasting
 go run ./examples/intermittent-demand
 go run ./examples/abc-xyz
 go run ./examples/retail
+go run ./examples/concurrent-batch
 ```
 
 These are standalone `main` packages for demonstration — they aren't part

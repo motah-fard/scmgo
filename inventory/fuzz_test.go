@@ -275,3 +275,44 @@ func FuzzSafetyTime(f *testing.F) {
 		}
 	})
 }
+
+// FuzzBuildPolicySummaryBatchConcurrentMatchesSequential builds a small
+// batch (a handful of items, each independently fuzzer-controlled, plus
+// duplicates to exercise more than one goroutine's worth of work) and
+// checks BuildPolicySummaryBatchConcurrent against BuildPolicySummaryBatch
+// exactly. Run with -race (this project's CI fuzz job does): the
+// property under test is "no two goroutines ever touch the same
+// result", and a race is the way that would actually show up.
+func FuzzBuildPolicySummaryBatchConcurrentMatchesSequential(f *testing.F) {
+	f.Add(100.0, 5.0, 7.0, 50.0, -1.0, 5.0, 7.0, 50.0)
+	f.Fuzz(func(t *testing.T, d1, l1, r1, s1, d2, l2, r2, s2 float64) {
+		base := []PolicySummaryInput{
+			{DailyDemand: d1, LeadTimeDays: l1, ReviewPeriodDays: r1, SafetyStockUnits: s1},
+			{DailyDemand: d2, LeadTimeDays: l2, ReviewPeriodDays: r2, SafetyStockUnits: s2},
+		}
+		// Repeat to spread across multiple goroutines' chunks, not just
+		// GOMAXPROCS=1 worth of work.
+		inputs := make([]PolicySummaryInput, 0, len(base)*50)
+		for i := 0; i < 50; i++ {
+			inputs = append(inputs, base...)
+		}
+
+		sequential := BuildPolicySummaryBatch(inputs)
+		concurrent := BuildPolicySummaryBatchConcurrent(inputs)
+
+		if len(concurrent) != len(sequential) {
+			t.Fatalf("length = %d, want %d", len(concurrent), len(sequential))
+		}
+		for i := range sequential {
+			if concurrent[i].Index != sequential[i].Index {
+				t.Fatalf("index %d: Index = %v, want %v", i, concurrent[i].Index, sequential[i].Index)
+			}
+			if (concurrent[i].Err == nil) != (sequential[i].Err == nil) {
+				t.Fatalf("index %d: Err = %v, want %v", i, concurrent[i].Err, sequential[i].Err)
+			}
+			if concurrent[i].Err == nil && concurrent[i].Summary != sequential[i].Summary {
+				t.Fatalf("index %d: Summary = %+v, want %+v", i, concurrent[i].Summary, sequential[i].Summary)
+			}
+		}
+	})
+}

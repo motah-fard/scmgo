@@ -112,6 +112,6 @@ jobs:
           set -e
           for name in $(go test "${{ matrix.package }}" -list '^Fuzz' | grep '^Fuzz'); do
             echo "::group::${{ matrix.package }} $name"
-            go test "${{ matrix.package }}" -run=NONE -fuzz="^${name}\$" -fuzztime=15s
+            go test "${{ matrix.package }}" -race -run=NONE -fuzz="^${name}\$" -fuzztime=15s
             echo "::endgroup::"
           done

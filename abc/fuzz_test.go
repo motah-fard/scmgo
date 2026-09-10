@@ -56,3 +56,43 @@ func FuzzClassifyVariability(f *testing.F) {
 		}
 	})
 }
+
+// FuzzClassifyVariabilityConcurrentMatchesSequential builds a batch
+// large enough to spread across multiple goroutines and checks
+// ClassifyVariabilityConcurrent against ClassifyVariability exactly.
+// Run with -race (this project's CI fuzz job does): the property under
+// test is "no two goroutines ever touch the same result", and a race is
+// the way that would actually show up.
+func FuzzClassifyVariabilityConcurrentMatchesSequential(f *testing.F) {
+	f.Add(100.0, 5.0, 50.0, 40.0, 0.10, 0.50)
+	f.Fuzz(func(t *testing.T, mean1, std1, mean2, std2, xThreshold, yThreshold float64) {
+		base := []VariabilityItem{
+			{ID: "1", MeanDemand: mean1, StdDevDemand: std1},
+			{ID: "2", MeanDemand: mean2, StdDevDemand: std2},
+		}
+		items := make([]VariabilityItem, 0, len(base)*50)
+		for i := 0; i < 50; i++ {
+			items = append(items, base...)
+		}
+
+		in := ClassifyVariabilityInput{Items: items, XThreshold: xThreshold, YThreshold: yThreshold}
+
+		wantSeq, errSeq := ClassifyVariability(in)
+		got, err := ClassifyVariabilityConcurrent(in)
+
+		if (err == nil) != (errSeq == nil) {
+			t.Fatalf("error mismatch: concurrent=%v sequential=%v", err, errSeq)
+		}
+		if err != nil {
+			return
+		}
+		if len(got) != len(wantSeq) {
+			t.Fatalf("length = %d, want %d", len(got), len(wantSeq))
+		}
+		for i := range wantSeq {
+			if got[i] != wantSeq[i] {
+				t.Fatalf("index %d: got %+v, want %+v", i, got[i], wantSeq[i])
+			}
+		}
+	})
+}

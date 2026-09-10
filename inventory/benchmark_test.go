@@ -1,6 +1,9 @@
 package inventory
 
-import "testing"
+import (
+	"strconv"
+	"testing"
+)
 
 func BenchmarkEOQ(b *testing.B) {
 	in := EOQInput{
@@ -51,5 +54,49 @@ func BenchmarkBuildPolicySummaryBatch(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = BuildPolicySummaryBatch(inputs)
+	}
+}
+
+// BenchmarkBuildPolicySummaryBatchSizes and
+// BenchmarkBuildPolicySummaryBatchConcurrentSizes exist to find the
+// crossover point where BuildPolicySummaryBatchConcurrent's goroutine
+// overhead stops costing more than it saves. Run both and compare:
+//
+//	go test ./inventory/... -bench 'BuildPolicySummaryBatch.*Sizes' -benchtime=200x
+func BenchmarkBuildPolicySummaryBatchSizes(b *testing.B) {
+	for _, n := range []int{100, 1_000, 10_000, 100_000} {
+		inputs := make([]PolicySummaryInput, n)
+		for i := range inputs {
+			inputs[i] = PolicySummaryInput{
+				DailyDemand:      100,
+				LeadTimeDays:     5,
+				ReviewPeriodDays: 7,
+				SafetyStockUnits: 50,
+			}
+		}
+		b.Run(strconv.Itoa(n), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_ = BuildPolicySummaryBatch(inputs)
+			}
+		})
+	}
+}
+
+func BenchmarkBuildPolicySummaryBatchConcurrentSizes(b *testing.B) {
+	for _, n := range []int{100, 1_000, 10_000, 100_000} {
+		inputs := make([]PolicySummaryInput, n)
+		for i := range inputs {
+			inputs[i] = PolicySummaryInput{
+				DailyDemand:      100,
+				LeadTimeDays:     5,
+				ReviewPeriodDays: 7,
+				SafetyStockUnits: 50,
+			}
+		}
+		b.Run(strconv.Itoa(n), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_ = BuildPolicySummaryBatchConcurrent(inputs)
+			}
+		})
 	}
 }
