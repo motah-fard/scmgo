@@ -39,6 +39,29 @@ All notable changes to this project will be documented in this file.
 - Added `-race` to the fuzz job (previously only the main test job ran
   with it) -- a data race is the actual failure mode concurrent code
   introduces that fuzzing without `-race` won't catch.
+- The `test` job now runs on a `[ubuntu-latest, macos-latest,
+  windows-latest]` x `["1.23", "1.24"]` matrix (`fail-fast: false`)
+  instead of Linux only. Coverage upload stays restricted to one leg
+  (`ubuntu-latest` + go1.24) to avoid uploading six redundant artifacts.
+- Added Dependabot for the `github-actions` ecosystem (`.github/dependabot.yml`,
+  weekly, grouped into one PR) -- this project already got burned once by
+  an action version silently losing compatibility
+  (`golangci-lint-action@v6` didn't support golangci-lint v2), caught only
+  by checking the Actions run itself, not local output.
+- Added an `apidiff` job comparing the `inventory` package's API against
+  the latest release tag, failing the build on any incompatible change.
+  `apidiff` itself always exits 0 -- even for a renamed export or changed
+  signature -- so the job greps its report for an `Incompatible changes:`
+  section rather than trusting the exit code (verified this by hand
+  before writing the job: a real incompatible change, and the empty-diff
+  case, both exit 0).
+- Added `smoketest/` -- a separate Go module (own `go.mod`, `replace`d to
+  this checkout) that imports scmgo by its published module path the way
+  an external consumer would, and calls one function per public package,
+  each checked against an independently-computed expected value. Runs as
+  its own CI job. Catches what the in-module examples and tests can't: an
+  accidentally-unexported symbol, or an internal package leaking into a
+  public one -- neither breaks a same-module `go build`.
 
 ## [v1.1.1] - 2026-09-04
 ### Added

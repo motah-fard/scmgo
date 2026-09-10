@@ -11,11 +11,13 @@ permissions:
 
 jobs:
   test:
-    name: test (go ${{ matrix.go-version }})
-    runs-on: ubuntu-latest
+    name: test (go ${{ matrix.go-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         go-version: ["1.23", "1.24"]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
 
@@ -33,7 +35,11 @@ jobs:
       - name: Vet
         run: go vet ./...
 
+      # Explicit shell: bash so this runs the same way on windows-latest
+      # (whose default shell is PowerShell) as it does on Linux/macOS --
+      # <(...) process substitution needs bash specifically.
       - name: Gofmt check
+        shell: bash
         run: |
           diff -u <(echo -n) <(gofmt -d .)
 
@@ -41,7 +47,7 @@ jobs:
         run: go test ./... -race -coverprofile=coverage.out
 
       - name: Upload coverage
-        if: matrix.go-version == '1.24'
+        if: matrix.go-version == '1.24' && matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
           name: coverage
@@ -62,6 +68,83 @@ jobs:
         uses: golangci/golangci-lint-action@v9
         with:
           version: v2.13
+
+  smoke-test:
+    name: external consumer smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          check-latest: true
+
+      # smoketest/ is its own module (see smoketest/go.mod's replace
+      # directive) that imports scmgo by its real module path, the way an
+      # external consumer would -- not a relative import within this
+      # module, which can't catch an accidentally-unexported symbol or an
+      # internal package leaking into a public one.
+      - name: Run smoke test
+        working-directory: smoketest
+        run: go run .
+
+  apidiff:
+    name: API compatibility (inventory)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          check-latest: true
+
+      - name: Install apidiff
+        run: go install golang.org/x/exp/cmd/apidiff@latest
+
+      # Baseline is the latest release tag, not main~1: we care whether
+      # HEAD broke the API that published-tag consumers already depend on,
+      # not whether the previous commit did.
+      - id: baseline
+        name: Find latest release tag
+        run: |
+          set -e
+          tag=$(git tag --list 'v*' --sort=-v:refname | head -n1)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if [ -z "$tag" ]; then
+            echo "No release tag found yet; skipping API compatibility check."
+          fi
+
+      - name: Check out baseline
+        if: steps.baseline.outputs.tag != ''
+        run: git worktree add /tmp/scmgo-baseline "${{ steps.baseline.outputs.tag }}"
+
+      - name: Write baseline export data
+        if: steps.baseline.outputs.tag != ''
+        working-directory: /tmp/scmgo-baseline
+        run: apidiff -w /tmp/inventory-old.export ./inventory
+
+      - name: Write current export data
+        if: steps.baseline.outputs.tag != ''
+        run: apidiff -w /tmp/inventory-new.export ./inventory
+
+      # apidiff always exits 0 and just prints a report -- it never fails
+      # the build on its own, even for a genuinely incompatible change (a
+      # renamed export, a changed signature). So the pass/fail decision has
+      # to come from the report text itself: no "Incompatible changes:"
+      # section means nothing broke.
+      - name: Compare
+        if: steps.baseline.outputs.tag != ''
+        run: |
+          set -e
+          apidiff /tmp/inventory-old.export /tmp/inventory-new.export | tee /tmp/apidiff-report.txt
+          if grep -q '^Incompatible changes:' /tmp/apidiff-report.txt; then
+            echo "::error::Incompatible API changes in inventory since ${{ steps.baseline.outputs.tag }}. If this is intentional, it needs a major version bump and a CHANGELOG.md entry explaining the break."
+            exit 1
+          fi
 
   fuzz-discover:
     name: discover fuzz packages
