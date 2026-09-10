@@ -866,6 +866,7 @@ This project follows semantic versioning.
 - `v1.0.1` fixed a `go.mod` directive-order issue; no API change
 - `v1.1.0` adds seven new packages (`abc`, `procurement`, `production`, `logistics`, `warehouse`, `quality`, `finance`), several `inventory` extensions (variable-lead-time and fill-rate safety stock, EPQ, quantity-discount EOQ, newsvendor, inventory ratios, EOI, safety time), several `forecast` extensions (Holt-Winters, tracking signal, linear trend, MASE, demand pattern classification, SBA, naive/seasonal naive), `quality.SigmaLevel`, and batch policy-summary helpers — all additive, no breaking changes
 - `v1.1.1` adds `examples/` (five runnable workflow programs), repositions the README, and drops the dead Go Report Card badge — no API change; see [CHANGELOG.md](CHANGELOG.md)
+- `v1.2.0` adds `internal/parallel.Map`, concurrent variants of two batch `inventory` functions and `abc.ClassifyVariability`, and cross-platform/API-compatibility CI hardening — all additive, no breaking changes; see [CHANGELOG.md](CHANGELOG.md)
 
 ## Documentation
 

@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [v1.2.0] - 2026-09-10
 ### Added
 - `internal/parallel.Map` — a generic, bounded-worker (`runtime.GOMAXPROCS(0)`)
   parallel map over a slice: fan-out over contiguous index ranges into a
@@ -34,8 +34,6 @@ All notable changes to this project will be documented in this file.
   why every `Concurrent` variant ships with `Sizes` benchmarks, not just
   a "should be faster" assumption -- also enforced now in
   `CONTRIBUTING.md`'s new `Concurrent`-variant checklist.
-
-### Fixed
 - Added `.gitattributes` (`* text=auto eol=lf`). The new `windows-latest`
   CI leg (see below) failed its Gofmt check on every file: `windows-latest`
   checks out text files as CRLF by default, and `gofmt` always emits LF,
