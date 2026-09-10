@@ -1,0 +1,8 @@
+# Force LF line endings on checkout regardless of platform or a
+# contributor's core.autocrlf setting. Without this, a Windows checkout
+# converts every text file to CRLF, and gofmt (which always emits LF)
+# then reports the entire file as unformatted -- not a real formatting
+# problem, just a line-ending mismatch. Repository blobs are already LF;
+# this only controls checkout/commit conversion, so no files need
+# renormalizing.
+* text=auto eol=lf

@@ -35,6 +35,15 @@ All notable changes to this project will be documented in this file.
   a "should be faster" assumption -- also enforced now in
   `CONTRIBUTING.md`'s new `Concurrent`-variant checklist.
 
+### Fixed
+- Added `.gitattributes` (`* text=auto eol=lf`). The new `windows-latest`
+  CI leg (see below) failed its Gofmt check on every file: `windows-latest`
+  checks out text files as CRLF by default, and `gofmt` always emits LF,
+  so the diff showed the entire file as "unformatted" on Windows even
+  though nothing was actually wrong. Repository blobs were already LF,
+  so this needed no renormalization commit -- just controlling future
+  checkouts.
+
 ### CI
 - Added `-race` to the fuzz job (previously only the main test job ran
   with it) -- a data race is the actual failure mode concurrent code
